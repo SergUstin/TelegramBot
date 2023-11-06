@@ -4,7 +4,7 @@ import com.example.telegrambot.config.BotConfig;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -18,11 +18,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 public class TelegramBot extends TelegramLongPollingBot {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     final BotConfig config;
 
@@ -34,7 +33,8 @@ public class TelegramBot extends TelegramLongPollingBot {
             "Type /help to see description bot\n\n" +
             "Type /settings to see setting bot";
 
-    public TelegramBot(BotConfig config) {
+    public TelegramBot(@Autowired UserRepository userRepository, @Autowired BotConfig config) {
+        this.userRepository = userRepository;
         this.config = config;
         List<BotCommand> listOfCommands = new ArrayList();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
