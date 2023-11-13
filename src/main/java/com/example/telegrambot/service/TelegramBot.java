@@ -3,6 +3,7 @@ package com.example.telegrambot.service;
 import com.example.telegrambot.config.BotConfig;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -18,11 +19,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class TelegramBot extends TelegramLongPollingBot {
 
+    @Autowired
     private final UserRepository userRepository;
 
+    @Autowired
     final BotConfig config;
 
     static final String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
@@ -33,7 +37,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             "Type /help to see description bot\n\n" +
             "Type /settings to see setting bot";
 
-    public TelegramBot(@Autowired UserRepository userRepository, @Autowired BotConfig config) {
+    public TelegramBot( UserRepository userRepository, BotConfig config) {
         this.userRepository = userRepository;
         this.config = config;
         List<BotCommand> listOfCommands = new ArrayList();
@@ -45,7 +49,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("Error setting bot's command list: " + e.getMessage());
         }
     }
 
@@ -102,6 +106,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void startCommandReceived(long chatId, String name) {
 
         String answer = "Hi, " + name + ", nice to meet you!";
+        log.info("Replied to user " + name);
 
         sendMessage(chatId, answer);
 
@@ -116,6 +121,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         try {
             execute(message);
-        } catch (TelegramApiException e) {}
+        } catch (TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
+        }
     }
 }
