@@ -1,17 +1,27 @@
 package com.example.telegrambot.config;
 
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.validation.annotation.Validated;
 
-@Data
+@Getter
+@Setter
 @Configuration
-@PropertySource("/application.properties")
-public class BotConfig {
+@EnableScheduling
+@Validated
+@ConfigurationProperties(prefix = "com.example.telegrambot.resources.application.properties")
+public class BotConfig extends AppProperties {
 
-    @Value("${bot.name}")
+    @NotBlank
     String botName;
-    @Value("${bot.token}")
+
+    @NotBlank
     String token;
+
+    @NotBlank
+    Long ownerId;
 }
