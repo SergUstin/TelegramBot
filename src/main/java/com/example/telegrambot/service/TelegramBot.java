@@ -5,32 +5,33 @@ import com.example.telegrambot.model.Ads;
 import com.example.telegrambot.model.AdsRepository;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
+import com.example.telegrambot.service.command.Command;
+import com.example.telegrambot.service.command.Help;
+import com.example.telegrambot.service.command.Register;
+import com.example.telegrambot.service.command.Start;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
-@Component
+@Service
 public class TelegramBot extends TelegramLongPollingBot {
 
     @Autowired
@@ -39,6 +40,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Autowired
     private AdsRepository adsRepository;
     final BotConfig config;
+
+    private Map<String, Command> commandMap;
 
     static final String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
             "Toy can execute commands from thr main menu on the left or by typing a command:\n\n" +
@@ -53,7 +56,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     static final String ERROR_TEXT = "Error occurred: ";
 
-    public TelegramBot( UserRepository userRepository, BotConfig config) {
+    public TelegramBot(UserRepository userRepository, BotConfig config) {
         this.userRepository = userRepository;
         this.config = config;
         List<BotCommand> listOfCommands = new ArrayList();
@@ -94,33 +97,29 @@ public class TelegramBot extends TelegramLongPollingBot {
                     prepareAndSendMessage(user.getChatId(), textToSend);
                 }
             } else {
-                switch (messageText) {
-                    case "/start":
-                        registerUser(update.getMessage());
-                        startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
-                        break;
-                    case "/help":
-                        prepareAndSendMessage(chatId, HELP_TEXT);
-                        break;
 
-                    case "/register":
-                        register(chatId);
-                        break;
-                    default:
-                        prepareAndSendMessage(chatId, "Sorry, command was not recognized");
-                }
+//                switch (messageText) {
+//                    case "/start":
+//                        break;
+//                    case "/help":
+//                        break;
+//
+//                    case "/register":
+//                        break;
+//                    default:
+//                }
             }
         } else if (update.hasCallbackQuery()){
-            String colldackData = update.getCallbackQuery().getData();
+            String callbackData = update.getCallbackQuery().getData();
             long messageId = update.getCallbackQuery().getMessage().getMessageId();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-            if (colldackData.equals(YES_BUTTON)) {
+            if (callbackData.equals(YES_BUTTON)) {
 
                 String text = "You pressed YES button";
                 executeEditMessageText(text, chatId, messageId);
 
-            } else if (colldackData.equals(NO_BUTTON)) {
+            } else if (callbackData.equals(NO_BUTTON)) {
 
                 String text = "You pressed NO button";
                 executeEditMessageText(text, chatId, messageId);
@@ -129,91 +128,91 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
-    private void register(long chatId) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText("Do you really want to register?");
+//    private void register(long chatId) {
+//        SendMessage message = new SendMessage();
+//        message.setChatId(String.valueOf(chatId));
+//        message.setText("Do you really want to register?");
+//
+//        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+//        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+//        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+//        var yesButton = new InlineKeyboardButton();
+//
+//        yesButton.setText("Yes");
+//        yesButton.setCallbackData(YES_BUTTON);
+//
+//        var noButton = new InlineKeyboardButton();
+//        noButton.setText("No");
+//        noButton.setCallbackData(NO_BUTTON);
+//
+//        rowInline.add(yesButton);
+//        rowInline.add(noButton);
+//
+//        rowsInline.add(rowInline);
+//
+//        markupInline.setKeyboard(rowsInline);
+//        message.setReplyMarkup(markupInline);
+//
+//        executeMessage(message);
+//
+//
+//    }
 
-        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> rowInline = new ArrayList<>();
-        var yesButton = new InlineKeyboardButton();
+//    public void registerUser(Message msg) {
+//        if (userRepository.findById(msg.getChatId()).isEmpty()) {
+//            var chatId = msg.getChatId();
+//            var chat = msg.getChat();
+//
+//            User user = new User();
+//            user.setChatId(chatId);
+//            user.setFirstName(chat.getFirstName());
+//            user.setLastName(chat.getLastName());
+//            user.setLastName(chat.getUserName());
+//            user.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
+//
+//            userRepository.save(user);
+//            log.info("user saved: " + user);
+//        }
+//
+//    }
 
-        yesButton.setText("Yes");
-        yesButton.setCallbackData(YES_BUTTON);
+//    public void startCommandReceived(long chatId, String name) {
+//
+//        String answer = EmojiParser.parseToUnicode("Hi, " + name + ", nice to meet you!" + " :blush:");
+//        log.info("Replied to user " + name);
+//
+//        sendMessage(chatId, answer);
+//
+//
+//
+//    }
 
-        var noButton = new InlineKeyboardButton();
-        noButton.setText("No");
-        noButton.setCallbackData(NO_BUTTON);
-
-        rowInline.add(yesButton);
-        rowInline.add(noButton);
-
-        rowsInline.add(rowInline);
-
-        markupInline.setKeyboard(rowsInline);
-        message.setReplyMarkup(markupInline);
-
-        executeMessage(message);
-
-
-    }
-
-    private void registerUser(Message msg) {
-        if (userRepository.findById(msg.getChatId()).isEmpty()) {
-            var chatId = msg.getChatId();
-            var chat = msg.getChat();
-
-            User user = new User();
-            user.setChatId(chatId);
-            user.setFirstName(chat.getFirstName());
-            user.setLastName(chat.getLastName());
-            user.setLastName(chat.getUserName());
-            user.setRegisteredAt(new Timestamp(System.currentTimeMillis()));
-
-            userRepository.save(user);
-            log.info("user saved: " + user);
-        }
-
-    }
-
-    private void startCommandReceived(long chatId, String name) {
-
-        String answer = EmojiParser.parseToUnicode("Hi, " + name + ", nice to meet you!" + " :blush:");
-        log.info("Replied to user " + name);
-
-        sendMessage(chatId, answer);
-
-
-
-    }
-
-    private void sendMessage(long chatId, String texToSend) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(texToSend);
-
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
-        row.add("weather");
-        row.add("get random joke");
-
-        keyboardRows.add(row);
-
-        row = new KeyboardRow();
-
-        row.add("register");
-        row.add("check my data");
-        row.add("delete my data");
-
-        keyboardRows.add(row);
-        keyboardMarkup.setKeyboard(keyboardRows);
-        message.setReplyMarkup(keyboardMarkup);
-
-        executeMessage(message);
-    }
+//    private void sendMessage(long chatId, String texToSend) {
+//        SendMessage message = new SendMessage();
+//        message.setChatId(String.valueOf(chatId));
+//        message.setText(texToSend);
+//
+//        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+//
+//        List<KeyboardRow> keyboardRows = new ArrayList<>();
+//        KeyboardRow row = new KeyboardRow();
+//        row.add("weather");
+//        row.add("get random joke");
+//
+//        keyboardRows.add(row);
+//
+//        row = new KeyboardRow();
+//
+//        row.add("register");
+//        row.add("check my data");
+//        row.add("delete my data");
+//
+//        keyboardRows.add(row);
+//        keyboardMarkup.setKeyboard(keyboardRows);
+//        message.setReplyMarkup(keyboardMarkup);
+//
+//        executeMessage(message);
+//    }
 
     private void executeEditMessageText(String text, long chatId, long messageId) {
         EditMessageText message = new EditMessageText();
@@ -244,7 +243,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         executeMessage(message);
     }
 
-    @Scheduled(cron = "${cron.scheduler}")
+//    @Scheduled(cron = "${cron.scheduler}")
     private void sendAds() {
 
         var ads = adsRepository.findAll();
