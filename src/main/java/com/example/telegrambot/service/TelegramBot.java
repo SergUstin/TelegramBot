@@ -5,7 +5,6 @@ import com.example.telegrambot.model.Ads;
 import com.example.telegrambot.model.AdsRepository;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
-import com.example.telegrambot.service.command.Command;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -40,9 +40,6 @@ public class TelegramBot extends TelegramLongPollingBot {
     private AdsRepository adsRepository;
     final BotConfig config;
 
-    @Autowired
-    private final List<Command> commandList;
-
     static final String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
             "Toy can execute commands from thr main menu on the left or by typing a command:\n\n" +
             "Type /start to see a welcome message\n\n" +
@@ -56,10 +53,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     static final String ERROR_TEXT = "Error occurred: ";
 
-    public TelegramBot(UserRepository userRepository, BotConfig config, List<Command> commandList) {
+    public TelegramBot( UserRepository userRepository, BotConfig config) {
         this.userRepository = userRepository;
         this.config = config;
-        this.commandList = commandList;
         List<BotCommand> listOfCommands = new ArrayList();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/mydata", "get your data store"));
@@ -94,45 +90,37 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (messageText.contains("/send") && config.getOwnerId() == chatId) {
                 var textToSend = EmojiParser.parseToUnicode(messageText.substring(messageText.indexOf(" ")));
                 var users = userRepository.findAll();
-                for (User user : users) {
+                for (User user: users) {
                     prepareAndSendMessage(user.getChatId(), textToSend);
                 }
-                // Начало стратегии
-            } else if (messageText.equals("/start")) {
-
-                commandList.stream().filter(command -> command.setCommand(messageText))
-                        .forEach(command -> {
-                            registerUser(update.getMessage());
-                            startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
-                        });
-
             } else {
+                switch (messageText) {
+                    case "/start":
+                        registerUser(update.getMessage());
+                        startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
+                        break;
+                    case "/help":
+                        prepareAndSendMessage(chatId, HELP_TEXT);
+                        break;
 
-                if (messageText.equals("/help")) {
-
-                    commandList.stream().filter(command -> command.setCommand(messageText))
-                            .forEach(command -> prepareAndSendMessage(chatId, HELP_TEXT));
-
-                } else if (messageText.equals("/register")) {
-
-                    commandList.stream().filter(command -> command.setCommand(messageText))
-                            .forEach(command -> register(chatId));
-
-                } else {
-                    prepareAndSendMessage(chatId, "Sorry, command was not recognized");
+                    case "/register":
+                        register(chatId);
+                        break;
+                    default:
+                        prepareAndSendMessage(chatId, "Sorry, command was not recognized");
                 }
             }
-        } else if (update.hasCallbackQuery()) {
-            String callbackData = update.getCallbackQuery().getData();
+        } else if (update.hasCallbackQuery()){
+            String colldackData = update.getCallbackQuery().getData();
             long messageId = update.getCallbackQuery().getMessage().getMessageId();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-            if (callbackData.equals(YES_BUTTON)) {
+            if (colldackData.equals(YES_BUTTON)) {
 
                 String text = "You pressed YES button";
                 executeEditMessageText(text, chatId, messageId);
 
-            } else if (callbackData.equals(NO_BUTTON)) {
+            } else if (colldackData.equals(NO_BUTTON)) {
 
                 String text = "You pressed NO button";
                 executeEditMessageText(text, chatId, messageId);
@@ -197,6 +185,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         sendMessage(chatId, answer);
 
 
+
     }
 
     private void sendMessage(long chatId, String texToSend) {
@@ -255,14 +244,14 @@ public class TelegramBot extends TelegramLongPollingBot {
         executeMessage(message);
     }
 
-    //    @Scheduled(cron = "${cron.scheduler}")
+    @Scheduled(cron = "${cron.scheduler}")
     private void sendAds() {
 
         var ads = adsRepository.findAll();
         var users = userRepository.findAll();
 
         for (Ads ad : ads) {
-            for (User user : users) {
+            for (User user: users) {
                 prepareAndSendMessage(user.getChatId(), ad.getAd());
             }
 
