@@ -11,10 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -25,6 +28,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,10 +67,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.commandList = commandList;
         List<BotCommand> listOfCommands = new ArrayList();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
-        listOfCommands.add(new BotCommand("/mydata", "get your data store"));
-        listOfCommands.add(new BotCommand("/deletedata", "delete my data"));
-        listOfCommands.add(new BotCommand("/help", "info how to use this bot"));
+        listOfCommands.add(new BotCommand("/send", "get your data store"));
+        listOfCommands.add(new BotCommand("/register", "delete my data"));
+        listOfCommands.add(new BotCommand("/photo", "get a photo"));
         listOfCommands.add(new BotCommand("/settings", "set your preferences"));
+        listOfCommands.add(new BotCommand("/help", "info how to use this bot"));
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
@@ -107,7 +113,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                         });
 
             } else {
-
                 if (messageText.equals("/help")) {
 
                     commandList.stream().filter(command -> command.setCommand(messageText))
@@ -118,8 +123,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                     commandList.stream().filter(command -> command.setCommand(messageText))
                             .forEach(command -> register(chatId));
 
+                } else if (messageText.equals("/photo")) {
+                    sendPhotoReceived(chatId, "C:\\Users\\Serg\\TelegramBot\\src\\main\\resources\\Java.jpg");
                 } else {
                     prepareAndSendMessage(chatId, "Sorry, command was not recognized");
+
                 }
             }
         } else if (update.hasCallbackQuery()) {
@@ -138,7 +146,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 executeEditMessageText(text, chatId, messageId);
             }
         }
-
     }
 
     private void register(long chatId) {
@@ -197,7 +204,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         sendMessage(chatId, answer);
 
 
-
     }
 
     private void sendMessage(long chatId, String texToSend) {
@@ -225,6 +231,27 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setReplyMarkup(keyboardMarkup);
 
         executeMessage(message);
+    }
+
+    private void sendPhotoReceived(long chatId, String path) {
+        File file = null;
+        try {
+            file = ResourceUtils.getFile(path);
+        } catch (FileNotFoundException e) {
+            log.error("File not found" + e.getMessage());
+        }
+        SendPhoto sendPhoto = new SendPhoto();
+        if (file != null) {
+            sendPhoto.setPhoto(new InputFile(file));
+        }
+        sendPhoto.setChatId(String.valueOf(chatId));
+        sendPhoto.setCaption("Вот ваша картинка");
+        try {
+            execute(sendPhoto);
+        } catch (TelegramApiException e) {
+            log.error(ERROR_TEXT + e.getMessage());
+        }
+
     }
 
     private void executeEditMessageText(String text, long chatId, long messageId) {
@@ -256,14 +283,14 @@ public class TelegramBot extends TelegramLongPollingBot {
         executeMessage(message);
     }
 
-    @Scheduled(cron = "${cron.scheduler}")
+    //    @Scheduled(cron = "${cron.scheduler}")
     private void sendAds() {
 
         var ads = adsRepository.findAll();
         var users = userRepository.findAll();
 
         for (Ads ad : ads) {
-            for (User user: users) {
+            for (User user : users) {
                 prepareAndSendMessage(user.getChatId(), ad.getAd());
             }
 
