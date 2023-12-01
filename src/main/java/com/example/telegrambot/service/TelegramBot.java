@@ -5,6 +5,7 @@ import com.example.telegrambot.model.Ads;
 import com.example.telegrambot.model.AdsRepository;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
+import com.example.telegrambot.service.command.SelectCommand;
 import com.example.telegrambot.service.command.SendMessageCommand;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     private AdsRepository adsRepository;
     final BotConfig config;
 
+    @Autowired
+    private SelectCommand selectCommand;
+
     static final String YES_BUTTON = "YES_BUTTON";
     static final String NO_BUTTON = "NO_BUTTON";
 
@@ -53,7 +57,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-
     @Override
     public String getBotUsername() {
         return config.getName();
@@ -71,19 +74,21 @@ public class TelegramBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
 
-            if (messageText.contains("/send")) {
+            selectCommand.changCommand(update);
 
-            } else if (messageText.equals("/start")) {
-
-            } else if (messageText.equals("/help")) {
-
-            } else if (messageText.equals("/register")) {
-
-            } else if (messageText.equals("/photo")) {
-
-            } else {
-
-            }
+//            if (messageText.contains("/send")) {
+//
+//            } else if (messageText.equals("/start")) {
+//
+//            } else if (messageText.equals("/help")) {
+//
+//            } else if (messageText.equals("/register")) {
+//
+//            } else if (messageText.equals("/photo")) {
+//
+//            } else {
+//
+//            }
         } else if (update.hasCallbackQuery()) {
 
             String callbackData = update.getCallbackQuery().getData();

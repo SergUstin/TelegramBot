@@ -2,6 +2,7 @@ package com.example.telegrambot.service.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 public class SelectCommand {
@@ -13,7 +14,7 @@ public class SelectCommand {
     private SendAddCommand sendAddCommand;
 
     @Autowired
-    private PhotoCommand getPhotoCommand;
+    private PhotoCommand photoCommand;
 
     @Autowired
     private RegisterCommand registerCommand;
@@ -29,8 +30,8 @@ public class SelectCommand {
         this.sendAddCommand = sendAddCommand;
     }
 
-    public void setGetPhotoCommand(PhotoCommand getPhotoCommand) {
-        this.getPhotoCommand = getPhotoCommand;
+    public void setPhotoCommand(PhotoCommand photoCommand) {
+        this.photoCommand = photoCommand;
     }
 
     public void setRegisterCommand(RegisterCommand registerCommand) {
@@ -40,4 +41,16 @@ public class SelectCommand {
     public void setHelpCommand(HelpCommand helpCommand) {
         this.helpCommand = helpCommand;
     }
+
+    public void changCommand(Update update) {
+        switch (update.getMessage().getText()) {
+            case "/start" -> startCommand.setCommand(update);
+            case "/send" -> sendAddCommand.setCommand(update);
+            case "/photo" -> photoCommand.setCommand(update);
+            case "/register" -> registerCommand.setCommand(update);
+            case "/help" -> helpCommand.setCommand(update);
+        }
+    }
+
+
 }
