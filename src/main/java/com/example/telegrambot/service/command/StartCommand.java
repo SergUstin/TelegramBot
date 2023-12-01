@@ -10,17 +10,8 @@ import java.util.Collections;
 
 @Component
 public class StartCommand extends Command {
-
-    //    @Override
-//    public boolean setCommand(String msg) {
-//        return msg.equals("/start");
-//    }
-
-    @Override
-    public SendMessage generateAnswerForUser(Long chatId) {
-        String answer = "Hi, nice to meet you! :blush:";
-        String answerUser = EmojiParser.parseToUnicode(answer);
-        return sendMessage(chatId, answerUser);
+        @Override
+    public boolean setCommand(String msg) {
+        return msg.equals("/start");
     }
-
 }

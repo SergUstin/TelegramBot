@@ -11,10 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -25,6 +28,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +51,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     static final String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
             "Toy can execute commands from thr main menu on the left or by typing a command:\n\n" +
             "Type /start to see a welcome message\n\n" +
-            "Type /mydata to see data stored message again\n\n" +
-            "Type /deletedata you can delete your data in stored\n\n" +
-            "Type /help to see description bot\n\n" +
-            "Type /settings to see setting bot";
+            "Type /sand you can sand message all users(only admin)\n\n" +
+            "Type /photo you can see photo\n\n" +
+            "Type /register you can register you data\n\n" +
+            "Type /settings to see setting bot\n\n" +
+            "Type /help to see description bot";
 
     static final String YES_BUTTON = "YES_BUTTON";
     static final String NO_BUTTON = "NO_BUTTON";
@@ -62,11 +68,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.commandList = commandList;
         List<BotCommand> listOfCommands = new ArrayList();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
-        listOfCommands.add(new BotCommand("/send", "get your data store"));
-        listOfCommands.add(new BotCommand("/register", "delete my data"));
+        listOfCommands.add(new BotCommand("/sand", "sand message all users(only admin)"));
+        listOfCommands.add(new BotCommand("/register", "register you data"));
         listOfCommands.add(new BotCommand("/photo", "get a photo"));
         listOfCommands.add(new BotCommand("/settings", "set your preferences"));
-        listOfCommands.add(new BotCommand("/help", "info how to use this bot"));
+        listOfCommands.add(new BotCommand("/help", "description bot"));
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
@@ -92,40 +98,34 @@ public class TelegramBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
 
-            if (messageText.contains("/send") && config.getOwnerId() == chatId) {
+            if (messageText.contains("/sand") && config.getOwnerId() == chatId) {
                 var textToSend = EmojiParser.parseToUnicode(messageText.substring(messageText.indexOf(" ")));
                 var users = userRepository.findAll();
                 for (User user : users) {
                     prepareAndSendMessage(user.getChatId(), textToSend);
                 }
-                // Начало стратегии
             } else if (messageText.equals("/start")) {
 
-                commandList.stream().filter(command -> command.setCommand(messageText))
-                        .forEach(command -> {
-                            registerUser(update.getMessage());
-                            startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
-                        });
+                registerUser(update.getMessage());
+                startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
+
+            } else if (messageText.equals("/help")) {
+
+                prepareAndSendMessage(chatId, HELP_TEXT);
+
+            } else if (messageText.equals("/register")) {
+
+                register(chatId);
+            } else if (messageText.equals("/photo")) {
+
+                sendPhotoReceived(chatId, "C:\\Users\\Serg\\TelegramBot\\src\\main\\resources\\Java.jpg");
 
             } else {
-                if (messageText.equals("/help")) {
 
-                    commandList.stream().filter(command -> command.setCommand(messageText))
-                            .forEach(command -> prepareAndSendMessage(chatId, HELP_TEXT));
-
-                } else if (messageText.equals("/register")) {
-
-                    commandList.stream().filter(command -> command.setCommand(messageText))
-                            .forEach(command -> register(chatId));
-
-                } else if (messageText.equals("/photo")) {
-                    sendPhotoReceived(chatId, "C:\\Users\\Serg\\TelegramBot\\src\\main\\resources\\Java.jpg");
-                } else {
-                    prepareAndSendMessage(chatId, "Sorry, command was not recognized");
-
-                }
+                prepareAndSendMessage(chatId, "Sorry, command was not recognized");
             }
         } else if (update.hasCallbackQuery()) {
+
             String callbackData = update.getCallbackQuery().getData();
             long messageId = update.getCallbackQuery().getMessage().getMessageId();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
