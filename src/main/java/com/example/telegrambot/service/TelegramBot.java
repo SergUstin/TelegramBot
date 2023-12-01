@@ -74,8 +74,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
 
-            selectCommand.changCommand(update);
-
 //            if (messageText.contains("/send")) {
 //
 //            } else if (messageText.equals("/start")) {
