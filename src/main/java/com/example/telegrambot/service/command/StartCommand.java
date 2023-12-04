@@ -13,8 +13,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.sql.Timestamp;
 
 @Slf4j
-@Component
-public class StartCommand extends SendObject implements SendMessageCommand {
+@Component("/start")
+public class StartCommand extends SendObject {
 
     @Autowired
     private UserRepository userRepository;
@@ -26,9 +26,9 @@ public class StartCommand extends SendObject implements SendMessageCommand {
                 update.getMessage().getChat().getFirstName() +
                 ", nice to meet you!" + " :blush:");
 
-        log.info("Replied to user " + update.getMessage().getChat().getFirstName());
 
         registerUser(update.getMessage());
+        log.info("Replied to user " + update.getMessage().getChat().getFirstName());
 
         return sendMessage(update.getMessage().getChatId(), answer);
     }

@@ -1,25 +1,17 @@
 package com.example.telegrambot.service;
 
 import com.example.telegrambot.config.BotConfig;
-import com.example.telegrambot.model.Ads;
-import com.example.telegrambot.model.AdsRepository;
-import com.example.telegrambot.model.User;
-import com.example.telegrambot.model.UserRepository;
 import com.example.telegrambot.service.command.SelectCommand;
 import com.example.telegrambot.service.command.SendMessageCommand;
-import com.vdurmont.emoji.EmojiParser;
+import com.example.telegrambot.service.command.SendObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -29,20 +21,18 @@ import java.util.List;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    @Autowired
-    private AdsRepository adsRepository;
-    final BotConfig config;
+    private final BotConfig config;
 
-    @Autowired
-    private SelectCommand selectCommand;
+    private final SelectCommand selectCommands;
 
     static final String YES_BUTTON = "YES_BUTTON";
     static final String NO_BUTTON = "NO_BUTTON";
 
     static final String ERROR_TEXT = "Error occurred: ";
 
-    public TelegramBot(BotConfig config) {
+    public TelegramBot(BotConfig config, SelectCommand selectCommands) {
         this.config = config;
+        this.selectCommands = selectCommands;
         List<BotCommand> listOfCommands = new ArrayList();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));

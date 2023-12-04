@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Objects;
 
-@Component
+@Component("/send")
 public class SendAddCommand extends SendObject implements SendMessageCommand {
     @Autowired
     private UserRepository userRepository;
@@ -26,6 +26,7 @@ public class SendAddCommand extends SendObject implements SendMessageCommand {
                 return sendMessage(user.getChatId(), textToSend);
             }
         }
+        //!!!!!!!
         return null;
     }
 }

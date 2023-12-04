@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public abstract class SendObject {
+public abstract class SendObject implements SendMessageCommand {
+
+
     SendMessage sendMessage(long chatId, String texToSend) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));

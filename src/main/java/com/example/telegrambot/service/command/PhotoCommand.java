@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-@Component
-public class PhotoCommand extends SendObject implements SendPhotoCommand {
+@Component("/photo")
+public class PhotoCommand extends SendObject {
 
     private String path = "C:\\Users\\Serg\\TelegramBot\\src\\main\\resources\\Java.jpg";
 

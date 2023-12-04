@@ -9,8 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class RegisterCommand extends SendObject implements SendMessageCommand {
+@Component("/register")
+public class RegisterCommand extends SendObject {
 
     static final String YES_BUTTON = "YES_BUTTON";
     static final String NO_BUTTON = "NO_BUTTON";
