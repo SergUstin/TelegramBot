@@ -19,14 +19,13 @@ public class SendAddCommand extends SendObject implements SendMessageCommand {
 
     @Override
     public SendMessage setCommand(Update update) {
-        if (Objects.equals(config.getOwnerId(), update.getMessage().getChatId())) {
+        if (!Objects.equals(config.getOwnerId(), update.getMessage().getChatId())) {
             var textToSend = EmojiParser.parseToUnicode(update.getMessage().getText().substring(update.getMessage().getText().indexOf(" ")));
             var users = userRepository.findAll();
             for (User user : users) {
                 return sendMessage(user.getChatId(), textToSend);
             }
         }
-        //!!!!!!!
-        return null;
+        return new IncorrectCommand().setCommand(update);
     }
 }

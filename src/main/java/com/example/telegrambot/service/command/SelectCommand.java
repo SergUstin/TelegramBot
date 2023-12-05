@@ -15,8 +15,8 @@ public class SelectCommand {
     @Autowired
     private List<SendMessageCommand> sendObjects;
 
-    // Пишем реализацию поиска бинов по названию
-    // Загуглить как искать бин по названию
-
+    public SendMessageCommand getCommandByName(String commandName) {
+        return (SendMessageCommand) applicationContext.getBean(commandName, sendObjects.stream().findFirst().isPresent());
+    }
 
 }

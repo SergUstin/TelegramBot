@@ -1,9 +1,9 @@
 package com.example.telegrambot.service;
 
 import com.example.telegrambot.config.BotConfig;
+import com.example.telegrambot.service.command.IncorrectCommand;
 import com.example.telegrambot.service.command.SelectCommand;
 import com.example.telegrambot.service.command.SendMessageCommand;
-import com.example.telegrambot.service.command.SendObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -23,16 +23,16 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
 
-    private final SelectCommand selectCommands;
+    private final SelectCommand selectCommand;
 
     static final String YES_BUTTON = "YES_BUTTON";
     static final String NO_BUTTON = "NO_BUTTON";
 
     static final String ERROR_TEXT = "Error occurred: ";
 
-    public TelegramBot(BotConfig config, SelectCommand selectCommands) {
+    public TelegramBot(BotConfig config, SelectCommand selectCommand) {
         this.config = config;
-        this.selectCommands = selectCommands;
+        this.selectCommand = selectCommand;
         List<BotCommand> listOfCommands = new ArrayList();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
@@ -64,19 +64,15 @@ public class TelegramBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
 
-//            if (messageText.contains("/send")) {
-//
-//            } else if (messageText.equals("/start")) {
-//
-//            } else if (messageText.equals("/help")) {
-//
-//            } else if (messageText.equals("/register")) {
-//
-//            } else if (messageText.equals("/photo")) {
-//
-//            } else {
-//
-//            }
+            SendMessageCommand command = selectCommand.getCommandByName(messageText);
+            if (command != null) {
+                try {
+                    execute(command.setCommand(update));
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
         } else if (update.hasCallbackQuery()) {
 
             String callbackData = update.getCallbackQuery().getData();
