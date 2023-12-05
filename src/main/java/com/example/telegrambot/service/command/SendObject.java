@@ -11,16 +11,18 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public abstract class SendObject {
+public abstract class SendObject implements SendMessageCommand {
 
     SendMessage sendMessage(long chatId, String texToSend) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(texToSend);
+        SendMessage message = SendMessage.builder()
+                .chatId(String.valueOf(chatId))
+                .text(texToSend)
+                .build();
 
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 
@@ -45,19 +47,12 @@ public abstract class SendObject {
     }
 
     SendPhoto sendPhoto(long chatId, String path) {
-        File file = null;
-        try {
-            file = ResourceUtils.getFile(path);
-        } catch (FileNotFoundException e) {
-            log.error("File not found" + e.getMessage());
-        }
-        SendPhoto sendPhoto = new SendPhoto();
-        if (file != null) {
-            sendPhoto.setPhoto(new InputFile(file));
-        }
-        sendPhoto.setChatId(String.valueOf(chatId));
-        sendPhoto.setCaption("Вот ваша картинка");
-
-        return sendPhoto;
+        InputStream resource = getClass().getResourceAsStream(path);
+        InputFile inputFile = new InputFile(resource, "Java.jpg");
+        return SendPhoto.builder()
+                .photo(inputFile)
+                .chatId(String.valueOf(chatId))
+                .caption("Вот ваша картинка")
+                .build();
     }
 }

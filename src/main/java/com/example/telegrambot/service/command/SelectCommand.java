@@ -16,7 +16,8 @@ public class SelectCommand {
     private List<SendMessageCommand> sendObjects;
 
     public SendMessageCommand getCommandByName(String commandName) {
-        return (SendMessageCommand) applicationContext.getBean(commandName, sendObjects.stream().findFirst().isPresent());
+        return (SendMessageCommand) applicationContext.getBean(commandName,
+                sendObjects.stream().findFirst().get());
     }
 
 }

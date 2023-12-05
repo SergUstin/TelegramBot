@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component("/register")
-public class RegisterCommand extends SendObject implements SendMessageCommand {
+public class RegisterCommand extends SendObject {
 
     static final String YES_BUTTON = "YES_BUTTON";
     static final String NO_BUTTON = "NO_BUTTON";

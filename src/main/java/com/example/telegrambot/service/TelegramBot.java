@@ -1,7 +1,6 @@
 package com.example.telegrambot.service;
 
 import com.example.telegrambot.config.BotConfig;
-import com.example.telegrambot.service.command.IncorrectCommand;
 import com.example.telegrambot.service.command.SelectCommand;
 import com.example.telegrambot.service.command.SendMessageCommand;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +61,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
+//            long chatId = update.getMessage().getChatId();
 
             SendMessageCommand command = selectCommand.getCommandByName(messageText);
             if (command != null) {

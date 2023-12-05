@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 
 @Slf4j
 @Component("/start")
-public class StartCommand extends SendObject implements SendMessageCommand {
+public class StartCommand extends SendObject {
 
     @Autowired
     private UserRepository userRepository;

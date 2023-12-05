@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.Objects;
 
 @Component("/send")
-public class SendAddCommand extends SendObject implements SendMessageCommand {
+public class SendAddCommand extends SendObject {
     @Autowired
     private UserRepository userRepository;
     private BotConfig config;
