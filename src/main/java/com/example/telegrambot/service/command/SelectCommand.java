@@ -15,9 +15,13 @@ public class SelectCommand {
     @Autowired
     private List<SendMessageCommand> sendObjects;
 
+    //Метод выбирающий нужный объект по тексту команды
     public SendMessageCommand getCommandByName(String commandName) {
+
         return (SendMessageCommand) applicationContext.getBean(commandName,
+                // Тестил stream в дебагере, доступ к полям есть!!
                 sendObjects.stream().findFirst().get());
+
     }
 
 }
