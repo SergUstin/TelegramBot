@@ -73,23 +73,17 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
 
         } else if (update.hasCallbackQuery()) {
-
             String callbackData = update.getCallbackQuery().getData();
             long messageId = update.getCallbackQuery().getMessage().getMessageId();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
-
             if (callbackData.equals(YES_BUTTON)) {
-
                 String text = "You pressed YES button";
                 executeEditMessageText(text, chatId, messageId);
-
             } else if (callbackData.equals(NO_BUTTON)) {
-
                 String text = "You pressed NO button";
                 executeEditMessageText(text, chatId, messageId);
             }
         }
-
     }
 
     private void executeEditMessageText(String text, long chatId, long messageId) {
