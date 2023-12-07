@@ -95,7 +95,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 executeEditMessageText(text, chatId, messageId);
             }
         }
-
     }
 
     private void executeEditMessageText(String text, long chatId, long messageId) {
