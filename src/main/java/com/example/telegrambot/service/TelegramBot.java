@@ -37,7 +37,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
         listOfCommands.add(new BotCommand("/register", "register you data"));
-        listOfCommands.add(new BotCommand("/photo", "get a photo"));
+//        listOfCommands.add(new BotCommand("/photo", "get a photo"));
         listOfCommands.add(new BotCommand("/settings", "set your preferences"));
         listOfCommands.add(new BotCommand("/help", "description bot"));
         try {
@@ -59,12 +59,18 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        String messageText;
 
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
+            messageText = update.getMessage().getText();
 
+            SendMessageCommand sendMessageCommand = selectTextCommand.getCommandByName(messageText);
 
-
+            try {
+                execute(sendMessageCommand.setCommand(update));
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
 
         } else if (update.hasCallbackQuery()) {
             try {
