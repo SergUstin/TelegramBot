@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.command;
+package com.example.telegrambot.service.text_command;
 
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 
 @Slf4j
 @Component("/start")
-public class StartCommand extends SendObject {
+public class StartCommand extends SendText {
 
     @Autowired
     private UserRepository userRepository;

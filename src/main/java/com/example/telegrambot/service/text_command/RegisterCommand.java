@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.command;
+package com.example.telegrambot.service.text_command;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component("/register")
-public class RegisterCommand extends SendObject {
+public class RegisterCommand extends SendText {
 
     static final String YES_BUTTON = "YES_BUTTON";
     static final String NO_BUTTON = "NO_BUTTON";

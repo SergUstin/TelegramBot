@@ -1,11 +1,11 @@
-package com.example.telegrambot.service.command;
+package com.example.telegrambot.service.text_command;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component("/help")
-public class HelpCommand extends SendObject{
+public class HelpCommand extends SendText {
 
     private final String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
             "Toy can execute commands from thr main menu on the left or by typing a command:\n\n" +

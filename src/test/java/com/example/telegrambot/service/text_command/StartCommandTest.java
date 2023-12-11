@@ -1,8 +1,6 @@
-package com.example.telegrambot.service.command;
+package com.example.telegrambot.service.text_command;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class StartCommandTest {
 

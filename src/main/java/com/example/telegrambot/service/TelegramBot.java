@@ -1,13 +1,14 @@
 package com.example.telegrambot.service;
 
 import com.example.telegrambot.config.BotConfig;
-import com.example.telegrambot.service.command.SelectCommand;
-import com.example.telegrambot.service.command.SendMessageCommand;
+import com.example.telegrambot.service.file_command.SelectFileCommand;
+import com.example.telegrambot.service.text_command.SelectTextCommand;
+import com.example.telegrambot.service.text_command.SendMessageCommand;
+import com.example.telegrambot.util.RowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
@@ -22,16 +23,16 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
 
-    private final SelectCommand selectCommand;
+    private final SelectTextCommand selectTextCommand;
 
-    static final String YES_BUTTON = "YES_BUTTON";
-    static final String NO_BUTTON = "NO_BUTTON";
+    private final SelectFileCommand selectFileCommand;
 
     static final String ERROR_TEXT = "Error occurred: ";
 
-    public TelegramBot(BotConfig config, SelectCommand selectCommand) {
+    public TelegramBot(BotConfig config, SelectTextCommand selectCommand, SelectFileCommand selectFileCommand) {
         this.config = config;
-        this.selectCommand = selectCommand;
+        this.selectTextCommand = selectCommand;
+        this.selectFileCommand = selectFileCommand;
         List<BotCommand> listOfCommands = new ArrayList();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
@@ -62,41 +63,15 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
 
-//            long chatId = update.getMessage().getChatId();
 
-            SendMessageCommand command = selectCommand.getCommandByName(messageText);
-            if (command != null) {
-                try {
-                    execute(command.setCommand(update));
-                } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+
 
         } else if (update.hasCallbackQuery()) {
-            String callbackData = update.getCallbackQuery().getData();
-            long messageId = update.getCallbackQuery().getMessage().getMessageId();
-            long chatId = update.getCallbackQuery().getMessage().getChatId();
-            if (callbackData.equals(YES_BUTTON)) {
-                String text = "You pressed YES button";
-                executeEditMessageText(text, chatId, messageId);
-            } else if (callbackData.equals(NO_BUTTON)) {
-                String text = "You pressed NO button";
-                executeEditMessageText(text, chatId, messageId);
+            try {
+                execute(RowUtil.rowSet(update));
+            } catch (TelegramApiException e) {
+                log.error(ERROR_TEXT + e.getMessage());
             }
-        }
-    }
-
-    private void executeEditMessageText(String text, long chatId, long messageId) {
-        EditMessageText message = new EditMessageText();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(text);
-        message.setMessageId((int) messageId);
-
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            log.error(ERROR_TEXT + e.getMessage());
         }
     }
 

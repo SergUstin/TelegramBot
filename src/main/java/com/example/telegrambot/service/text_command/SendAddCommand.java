@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.command;
+package com.example.telegrambot.service.text_command;
 
 import com.example.telegrambot.config.BotConfig;
 import com.example.telegrambot.model.User;
@@ -12,14 +12,14 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.Objects;
 
 @Component("/send")
-public class SendAddCommand extends SendObject {
+public class SendAddCommand extends SendText {
     @Autowired
     private UserRepository userRepository;
     private BotConfig config;
 
     @Override
     public SendMessage setCommand(Update update) {
-        if (!Objects.equals(config.getOwnerId(), update.getMessage().getChatId())) {
+        if (Objects.equals(config.getOwnerId(), update.getMessage().getChatId())) {
             var textToSend = EmojiParser.parseToUnicode(update.getMessage().getText().substring(update.getMessage().getText().indexOf(" ")));
             var users = userRepository.findAll();
             for (User user : users) {
