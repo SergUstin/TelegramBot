@@ -1,6 +1,6 @@
 package com.example.telegrambot.service.text_command;
 
-import com.example.telegrambot.service.TelegramBot;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,10 +8,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,54 +21,62 @@ public class SelectTextCommandTest {
     private ApplicationContext applicationContext;
 
     @Mock
-    private List<SendMessageCommand> sendObjects;
+    private SendMessageCommand sendMessageCommand;
 
     @InjectMocks
     private SelectTextCommand selectTextCommand;
 
+    @BeforeEach
+    void setUp() {
+        selectTextCommand.setApplicationContext(applicationContext);
+    }
+
     @Test
     void testGetCommandByName_ExistingCommand_ReturnsSendMessageCommand() {
         // Arrange
-        String commandName = "/help";
-        HelpCommand expectedCommand = mock(HelpCommand.class);
+        String commandName = "validCommand";
         when(applicationContext.containsBean(commandName)).thenReturn(true);
-        when(applicationContext.getBean(HelpCommand.class)).thenReturn(expectedCommand);
+        when(applicationContext.getBean(commandName, sendMessageCommand)).thenReturn(sendMessageCommand);
 
         // Act
         SendMessageCommand result = selectTextCommand.getCommandByName(commandName);
 
         // Assert
-        assertEquals(expectedCommand, result);
+        assertEquals(sendMessageCommand, result);
     }
 
     @Test
     void testGetCommandByName_NonExistingCommand_ReturnsIncorrectCommand() {
         // Arrange
-        String commandName = "invalidCommand";
-        IncorrectCommand expectedCommand = mock(IncorrectCommand.class);
-        when(applicationContext.containsBean(commandName)).thenReturn(false);
-        when(applicationContext.getBean(IncorrectCommand.class)).thenReturn(expectedCommand);
+        String invalidCommandName = "invalidCommand";
+        when(applicationContext.containsBean(invalidCommandName)).thenReturn(false);
+        IncorrectCommand incorrectCommand = new IncorrectCommand();
+        when(applicationContext.getBean(IncorrectCommand.class)).thenReturn(incorrectCommand);
 
         // Act
-        SendMessageCommand result = selectTextCommand.getCommandByName(commandName);
+        SendMessageCommand result = selectTextCommand.getCommandByName(invalidCommandName);
 
         // Assert
-        assertEquals(expectedCommand, result);
+        assertEquals(incorrectCommand, result);
     }
 
     @Test
     void testGetCommandByName_FactoryCreatesAllStrategyInstances() {
         // Arrange
-        String commandName = "existingCommand";
-        SendMessageCommand expectedCommand = mock(SendMessageCommand.class);
-        when(applicationContext.containsBean(commandName)).thenReturn(true);
-        when(applicationContext.getBean(commandName, SendMessageCommand.class)).thenReturn(expectedCommand);
-        when(sendObjects.stream().findFirst().orElse(null)).thenReturn(expectedCommand);
+        List<SendMessageCommand> sendObjects = Arrays.asList(new StartCommand(), new HelpCommand());
+        when(applicationContext.containsBean("StartCommand")).thenReturn(true);
+        when(applicationContext.containsBean("HelpCommand")).thenReturn(true);
+        when(applicationContext.getBean("StartCommand", sendObjects.get(0))).thenReturn(sendObjects.get(0));
+        when(applicationContext.getBean("HelpCommand", sendObjects.get(1))).thenReturn(sendObjects.get(1));
+
+        selectTextCommand.setSendObjects(sendObjects);
 
         // Act
-        SendMessageCommand result = selectTextCommand.getCommandByName(commandName);
+        SendMessageCommand resultStrategy1 = selectTextCommand.getCommandByName("StartCommand");
+        SendMessageCommand resultStrategy2 = selectTextCommand.getCommandByName("HelpCommand");
 
         // Assert
-        assertEquals(expectedCommand, result);
+        assertEquals(StartCommand.class, resultStrategy1.getClass());
+        assertEquals(HelpCommand.class, resultStrategy2.getClass());
     }
 }
