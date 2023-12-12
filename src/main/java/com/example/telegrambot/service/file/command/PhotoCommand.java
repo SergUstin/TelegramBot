@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.file_command;//todo не называй пакеты с нижним подчеркиванием, плиз
+package com.example.telegrambot.service.file.command;//todo не называй пакеты с нижним подчеркиванием, плиз
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;

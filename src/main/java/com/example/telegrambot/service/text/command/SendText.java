@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.text_command;
+package com.example.telegrambot.service.text.command;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

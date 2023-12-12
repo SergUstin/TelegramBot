@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.text_command;
+package com.example.telegrambot.service.text.command;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

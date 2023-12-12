@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.text_command;
+package com.example.telegrambot.service.text.command;
 
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
