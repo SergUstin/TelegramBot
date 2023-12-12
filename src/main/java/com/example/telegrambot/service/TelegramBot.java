@@ -64,6 +64,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             messageText = update.getMessage().getText();
 
+
             SendMessageCommand sendMessageCommand = selectTextCommand.getCommandByName(messageText);
 
             try {

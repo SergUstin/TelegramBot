@@ -19,6 +19,7 @@ public class SelectTextCommand {
         this.applicationContext = applicationContext;
     }
 
+
     @Autowired
     public void setSendObjects(List<SendMessageCommand> sendObjects) {
         this.sendObjects = sendObjects;
