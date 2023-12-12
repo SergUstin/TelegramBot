@@ -28,6 +28,8 @@ public class SelectTextCommand {
         return applicationContext.getBean(commandName,
                 sendObjects.stream()
                         .findAny()
+
+
                         .orElseGet(() -> applicationContext.getBean(IncorrectCommand.class)) //todo попытался, но теперь начал выбрасывать BeanNotOfRequiredTypeException:
                         .getClass()); //todo старайся никогда не использовать get().
         //todo там есть команды orElseGet и orElseThrow
