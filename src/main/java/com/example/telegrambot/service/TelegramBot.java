@@ -33,7 +33,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.config = config;
         this.selectTextCommand = selectCommand;
         this.selectFileCommand = selectFileCommand;
-        List<BotCommand> listOfCommands = new ArrayList();
+        List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
         listOfCommands.add(new BotCommand("/register", "register you data"));
@@ -63,8 +63,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             messageText = update.getMessage().getText();
-
-
             SendMessageCommand sendMessageCommand = selectTextCommand.getCommandByName(messageText);
 
             try {

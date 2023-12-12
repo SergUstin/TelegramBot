@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +29,8 @@ public class SelectTextCommandTest {
 
     @BeforeEach
     void setUp() {
-        selectTextCommand.setApplicationContext(applicationContext);
+        //не понимаю зачем тебе вот это
+        //selectTextCommand.setApplicationContext(applicationContext);
     }
 
     @Test
@@ -65,19 +66,21 @@ public class SelectTextCommandTest {
     void testGetCommandByName_FactoryCreatesAllStrategyInstances() {
         // Arrange
         List<SendMessageCommand> sendObjects = Arrays.asList(new StartCommand(), new HelpCommand());
-        when(applicationContext.containsBean("StartCommand")).thenReturn(true);
-        when(applicationContext.containsBean("HelpCommand")).thenReturn(true);
-        when(applicationContext.getBean("StartCommand", sendObjects.get(0))).thenReturn(sendObjects.get(0));
-        when(applicationContext.getBean("HelpCommand", sendObjects.get(1))).thenReturn(sendObjects.get(1));
+        when(applicationContext.containsBean("startCommand")).thenReturn(true);
+
+        //todo тесты лучше делать атомарными. чтобы они пятьсот всего не проверяли. не поняла зачем тут второй класс, если достаточно одного
+//        when(applicationContext.containsBean("helpCommand")).thenReturn(true);
+        when(applicationContext.getBean("startCommand", StartCommand.class)).thenReturn((StartCommand)sendObjects.get(0));
+//        when(applicationContext.getBean("helpCommand", sendObjects.get(1))).thenReturn(sendObjects.get(1));
 
         selectTextCommand.setSendObjects(sendObjects);
 
         // Act
-        SendMessageCommand resultStrategy1 = selectTextCommand.getCommandByName("StartCommand");
-        SendMessageCommand resultStrategy2 = selectTextCommand.getCommandByName("HelpCommand");
+        SendMessageCommand resultStrategy1 = selectTextCommand.getCommandByName("startCommand");
+//        SendMessageCommand resultStrategy2 = selectTextCommand.getCommandByName("helpCommand");
 
         // Assert
         assertEquals(StartCommand.class, resultStrategy1.getClass());
-        assertEquals(HelpCommand.class, resultStrategy2.getClass());
+//        assertEquals(HelpCommand.class, resultStrategy2.getClass());
     }
 }
