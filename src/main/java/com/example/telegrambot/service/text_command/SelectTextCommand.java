@@ -27,8 +27,9 @@ public class SelectTextCommand {
 
     public SendMessageCommand getCommandByName(String commandName) {
         if (applicationContext.containsBean(commandName) && sendObjects != null) {
-            return (SendMessageCommand) applicationContext.getBean(commandName,
-                    sendObjects.stream().findFirst().get());
+            return applicationContext.getBean(commandName,
+                    sendObjects.stream().findFirst().get().getClass()); //todo старайся никогда не использовать get().
+            //todo там есть команды orElseGet и orElseThrow
         } else {
             return applicationContext.getBean(IncorrectCommand.class);
         }
