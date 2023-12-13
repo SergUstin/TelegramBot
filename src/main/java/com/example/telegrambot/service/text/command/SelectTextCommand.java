@@ -1,37 +1,40 @@
 package com.example.telegrambot.service.text.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Component
 public class SelectTextCommand {
 
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
-    private List<SendMessageCommand> sendObjects;
+    private final List<SendMessageCommand> sendObjects;
 
     @Autowired
-    public void setApplicationContext(ApplicationContext applicationContext) {
+    public SelectTextCommand(ApplicationContext applicationContext, List<SendMessageCommand> sendObjects) {
         this.applicationContext = applicationContext;
-    }
-
-
-    @Autowired
-    public void setSendObjects(List<SendMessageCommand> sendObjects) {
         this.sendObjects = sendObjects;
     }
 
     public SendMessageCommand getCommandByName(String commandName) {
-        return applicationContext.getBean(commandName,
-                sendObjects.stream()
-                        .findAny()
 
+        return (SendMessageCommand) applicationContext
+                .getBean(commandName,
+                        sendObjects.stream()
+                                .filter(sendMessageCommand -> applicationContext.containsBean(commandName))
+                                .findFirst()
+                                .orElseGet(() -> applicationContext.getBean(IncorrectCommand.class)));
 
-                        .orElseGet(() -> applicationContext.getBean(IncorrectCommand.class)) //todo попытался, но теперь начал выбрасывать BeanNotOfRequiredTypeException:
-                        .getClass()); //todo старайся никогда не использовать get().
+//        return applicationContext.getBean(commandName,
+//                sendObjects.stream()
+//                        .findAny()
+//                        .orElseGet(() -> applicationContext.getBean(IncorrectCommand.class)) //todo попытался, но теперь начал выбрасывать BeanNotOfRequiredTypeException:
+//                        .getClass()); //todo старайся никогда не использовать get().
         //todo там есть команды orElseGet и orElseThrow
 
     }

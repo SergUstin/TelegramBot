@@ -1,12 +1,15 @@
 package com.example.telegrambot.service.text.command;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.example.telegrambot.config.BotConfig;
+import com.example.telegrambot.service.TelegramBot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +18,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {BotConfig.class, SelectTextCommandTest.class})
 public class SelectTextCommandTest {
 
     @Mock
@@ -26,12 +30,6 @@ public class SelectTextCommandTest {
 
     @InjectMocks
     private SelectTextCommand selectTextCommand;
-
-    @BeforeEach
-    void setUp() {
-        //не понимаю зачем тебе вот это
-        //selectTextCommand.setApplicationContext(applicationContext);
-    }
 
     @Test
     void testGetCommandByName_ExistingCommand_ReturnsSendMessageCommand() {
@@ -73,7 +71,7 @@ public class SelectTextCommandTest {
         when(applicationContext.getBean("startCommand", StartCommand.class)).thenReturn((StartCommand)sendObjects.get(0));
 //        when(applicationContext.getBean("helpCommand", sendObjects.get(1))).thenReturn(sendObjects.get(1));
 
-        selectTextCommand.setSendObjects(sendObjects);
+//        selectTextCommand.setSendObjects(sendObjects);
 
         // Act
         SendMessageCommand resultStrategy1 = selectTextCommand.getCommandByName("startCommand");
