@@ -1,15 +1,11 @@
 package com.example.telegrambot.service.text.command;
 
-import com.example.telegrambot.config.BotConfig;
-import com.example.telegrambot.service.TelegramBot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {BotConfig.class, SelectTextCommandTest.class})
+@ExtendWith(MockitoExtension.class)
 public class SelectTextCommandTest {
 
     @Mock
@@ -34,15 +29,18 @@ public class SelectTextCommandTest {
     @Test
     void testGetCommandByName_ExistingCommand_ReturnsSendMessageCommand() {
         // Arrange
-        String commandName = "validCommand";
-        when(applicationContext.containsBean(commandName)).thenReturn(true);
-        when(applicationContext.getBean(commandName, sendMessageCommand)).thenReturn(sendMessageCommand);
+        List<SendMessageCommand> commandList = List.of(new StartCommand());
+        String validCommandName = "validCommand";
+        when(applicationContext.containsBean(validCommandName)).thenReturn(true);
+        when(applicationContext.getBean(StartCommand.class)).thenReturn((StartCommand) commandList.get(0));
+
+        selectTextCommand.setSendObjects(commandList);
 
         // Act
-        SendMessageCommand result = selectTextCommand.getCommandByName(commandName);
+        SendMessageCommand result = selectTextCommand.getCommandByName(validCommandName);
 
         // Assert
-        assertEquals(sendMessageCommand, result);
+        assertEquals(StartCommand.class, result.getClass());
     }
 
     @Test
@@ -67,11 +65,9 @@ public class SelectTextCommandTest {
         when(applicationContext.containsBean("startCommand")).thenReturn(true);
 
         //todo тесты лучше делать атомарными. чтобы они пятьсот всего не проверяли. не поняла зачем тут второй класс, если достаточно одного
-//        when(applicationContext.containsBean("helpCommand")).thenReturn(true);
         when(applicationContext.getBean("startCommand", StartCommand.class)).thenReturn((StartCommand)sendObjects.get(0));
-//        when(applicationContext.getBean("helpCommand", sendObjects.get(1))).thenReturn(sendObjects.get(1));
 
-//        selectTextCommand.setSendObjects(sendObjects);
+        selectTextCommand.setSendObjects(sendObjects);
 
         // Act
         SendMessageCommand resultStrategy1 = selectTextCommand.getCommandByName("startCommand");
