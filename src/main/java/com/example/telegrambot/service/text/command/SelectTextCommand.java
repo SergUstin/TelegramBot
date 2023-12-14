@@ -25,18 +25,15 @@ public class SelectTextCommand {
 
     public SendMessageCommand getCommandByName(String commandName) {
         if (applicationContext.containsBean(commandName)) {
-            return (SendMessageCommand) applicationContext.getBean(commandName,
-                    sendObjects.stream().findAny().isPresent());
+            return applicationContext.getBean(commandName, SendMessageCommand.class);
         } else {
             return applicationContext.getBean(IncorrectCommand.class);
         }
-
-//        return applicationContext.getBean(commandName,
-//                sendObjects.stream()
-//                        .findAny()
-//                        .orElseGet(() -> applicationContext.getBean(IncorrectCommand.class)) //todo попытался, но теперь начал выбрасывать BeanNotOfRequiredTypeException:
-//                        .getClass()); //todo старайся никогда не использовать get().
-//        //todo там есть команды orElseGet и orElseThrow
-
+//        if (applicationContext.containsBean(commandName)) {
+//            return (SendMessageCommand) applicationContext.getBean(commandName,
+//                    sendObjects.stream().findAny().isPresent());
+//        } else {
+//            return applicationContext.getBean(IncorrectCommand.class);
+//        }
     }
 }
