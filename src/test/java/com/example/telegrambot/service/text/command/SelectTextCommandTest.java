@@ -12,6 +12,7 @@ import java.util.List;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,6 +23,35 @@ public class SelectTextCommandTest {
 
     @InjectMocks
     private SelectTextCommand selectTextCommand;
+
+    @Test
+    void testStrategyPattern() {
+        List<SendMessageCommand> sendObjects = List.of(
+                new StartCommand(),
+                new HelpCommand()
+                //and others
+                );
+
+        FactoryExample factoryExample = new FactoryExample(sendObjects);
+        List<SendMessageCommand> process = factoryExample.process("/start");
+        String actualResult = process.get(0).getClass().getSimpleName();
+
+        assertEquals("StartCommand", actualResult);
+    }
+
+    @Test
+    void testStrategyPatternWrong() {
+        List<SendMessageCommand> sendObjects = List.of(
+                new StartCommand(),
+                new HelpCommand()
+                //and others
+        );
+
+        FactoryExample factoryExample = new FactoryExample(sendObjects);
+        List<SendMessageCommand> process = factoryExample.process("/new_command");
+
+        assertTrue(process.isEmpty());
+    }
 
     @Test
     void testGetCommandByName_ExistingCommand_ReturnsSendMessageCommand() {
@@ -55,7 +85,7 @@ public class SelectTextCommandTest {
         List<SendMessageCommand> sendObjects = Arrays.asList(new StartCommand(), new HelpCommand());
         when(applicationContext.containsBean("startCommand")).thenReturn(true);
 
-        when(applicationContext.getBean("startCommand", SendMessageCommand.class)).thenReturn((StartCommand)sendObjects.get(0));
+        when(applicationContext.getBean("startCommand", SendMessageCommand.class)).thenReturn((StartCommand) sendObjects.get(0));
 
         selectTextCommand.setSendObjects(sendObjects);
 
