@@ -1,9 +1,11 @@
 package com.example.telegrambot.service.text.command;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+@Qualifier
 @Component("/help")
 public class HelpCommand extends SendText {
 

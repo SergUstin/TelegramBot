@@ -85,7 +85,7 @@ public class SelectTextCommandTest {
         List<SendMessageCommand> sendObjects = Arrays.asList(new StartCommand(), new HelpCommand());
         when(applicationContext.containsBean("startCommand")).thenReturn(true);
 
-        when(applicationContext.getBean("startCommand", SendMessageCommand.class)).thenReturn((StartCommand) sendObjects.get(0));
+        when(applicationContext.getBean("startCommand", SendMessageCommand.class)).thenReturn(sendObjects.get(0));
 
         selectTextCommand.setSendObjects(sendObjects);
 
