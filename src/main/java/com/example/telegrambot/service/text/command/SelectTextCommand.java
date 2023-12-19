@@ -25,7 +25,6 @@ public class SelectTextCommand {
     }
 
     public SendMessageCommand getCommandByName(String commandName) {
-
         return applicationContext.getBean(commandName,
                 sendObjects.stream()
                         .findAny()
