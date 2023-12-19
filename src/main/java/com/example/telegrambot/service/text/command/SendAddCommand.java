@@ -13,7 +13,7 @@ import java.util.Objects;
 
 @Component("/send")
 public class SendAddCommand extends SendText {
-    @Autowired
+
     private UserRepository userRepository;
     private BotConfig config;
 

@@ -15,14 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 public class SelectTextCommandTest {
-
-    @Mock
-    private ApplicationContext applicationContext;
-
-    @InjectMocks
-    private SelectTextCommand selectTextCommand;
 
     @Test
     void testStrategyPattern() {
@@ -51,45 +44,5 @@ public class SelectTextCommandTest {
         List<SendMessageCommand> process = factoryExample.process("/new_command");
 
         assertTrue(process.isEmpty());
-    }
-
-    @Test
-    void testGetCommandByName_ExistingCommand_ReturnsSendMessageCommand() {
-        List<SendMessageCommand> sendObjects = List.of(new StartCommand());
-
-        when(applicationContext.containsBean("validCommand")).thenReturn(true);
-        StartCommand startCommand = new StartCommand();
-        when(applicationContext.getBean("validCommand", SendMessageCommand.class)).thenReturn(startCommand);
-
-        selectTextCommand.setSendObjects(sendObjects);
-
-        SendMessageCommand result = selectTextCommand.getCommandByName("validCommand");
-
-        assertEquals(startCommand, result);
-    }
-
-    @Test
-    void testGetCommandByName_NonExistingCommand_ReturnsIncorrectCommand() {
-        String invalidCommandName = "invalidCommand";
-        when(applicationContext.containsBean(invalidCommandName)).thenReturn(false);
-        IncorrectCommand incorrectCommand = new IncorrectCommand();
-        when(applicationContext.getBean(IncorrectCommand.class)).thenReturn(incorrectCommand);
-
-        SendMessageCommand result = selectTextCommand.getCommandByName(invalidCommandName);
-
-        assertEquals(incorrectCommand, result);
-    }
-
-    @Test
-    void testGetCommandByName_FactoryCreatesAllStrategyInstances() {
-        List<SendMessageCommand> sendObjects = Arrays.asList(new StartCommand(), new HelpCommand());
-        when(applicationContext.containsBean("startCommand")).thenReturn(true);
-
-        when(applicationContext.getBean("startCommand", SendMessageCommand.class)).thenReturn(sendObjects.get(0));
-
-        selectTextCommand.setSendObjects(sendObjects);
-
-        SendMessageCommand resultStrategy1 = selectTextCommand.getCommandByName("startCommand");
-        assertEquals(StartCommand.class, resultStrategy1.getClass());
     }
 }

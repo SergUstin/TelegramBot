@@ -4,36 +4,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class SelectTextCommand {
-
-    private ApplicationContext applicationContext;
-
-    private List<SendMessageCommand> sendObjects;
+    private final List<SendMessageCommand> list;
 
     @Autowired
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public SelectTextCommand(List<SendMessageCommand> list) {
+        this.list = list;
     }
 
-    @Autowired
-    public void setSendObjects(List<SendMessageCommand> sendObjects) {
-        this.sendObjects = sendObjects;
-    }
-
-    public SendMessageCommand getCommandByName(String commandName) {
-        if (applicationContext.containsBean(commandName)) {
-            return applicationContext.getBean(commandName, SendMessageCommand.class);
-        } else {
-            return applicationContext.getBean(IncorrectCommand.class);
-        }
-//        if (applicationContext.containsBean(commandName)) {
-//            return (SendMessageCommand) applicationContext.getBean(commandName,
-//                    sendObjects.stream().findAny().isPresent());
-//        } else {
-//            return applicationContext.getBean(IncorrectCommand.class);
-//        }
+    public List<SendMessageCommand> getCommandByName(String command) {
+        return list.stream()
+                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class)
+                        && clazz.getClass().getAnnotation(Component.class).value().equals(command))
+                .findFirst()
+                .map(Collections::singletonList)
+                .orElse(
+                        list.stream()
+                                .filter(clazz -> clazz.getClass().getAnnotation(Component.class)
+                                        .value().equals("/incorrect"))
+                                .findFirst().stream().toList()
+                );
     }
 }

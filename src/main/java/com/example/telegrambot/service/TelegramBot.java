@@ -63,12 +63,16 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             messageText = update.getMessage().getText();
-            SendMessageCommand sendMessageCommand = selectTextCommand.getCommandByName(messageText);
+            List<SendMessageCommand> commandByName = selectTextCommand.getCommandByName(messageText);
 
-            try {
-                execute(sendMessageCommand.setCommand(update));
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+            for (SendMessageCommand command : commandByName) {
+
+                try {
+                    execute(command.setCommand(update));
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
         } else if (update.hasCallbackQuery()) {
