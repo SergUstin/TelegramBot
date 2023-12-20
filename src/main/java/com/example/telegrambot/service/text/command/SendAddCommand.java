@@ -13,8 +13,10 @@ import java.util.Objects;
 
 @Component("/send")
 public class SendAddCommand extends SendText {
-    @Autowired
+
+    @Autowired // Я не понимаю почему я удалил!! Вернул
     private UserRepository userRepository;
+
     private BotConfig config;
 
     @Override

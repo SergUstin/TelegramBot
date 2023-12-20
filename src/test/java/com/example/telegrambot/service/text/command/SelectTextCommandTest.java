@@ -1,6 +1,5 @@
 package com.example.telegrambot.service.text.command;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,74 +12,37 @@ import java.util.List;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 public class SelectTextCommandTest {
 
-    @Mock
-    private ApplicationContext applicationContext;
+    @Test
+    void testStrategyPattern() {
+        List<SendMessageCommand> sendObjects = List.of(
+                new StartCommand(),
+                new HelpCommand()
+                //and others
+                );
 
-    @Mock
-    private SendMessageCommand sendMessageCommand;
+        SelectTextCommand factoryExample = new SelectTextCommand(sendObjects);
+        List<SendMessageCommand> process = factoryExample.getCommandByName("/start");
+        String actualResult = process.get(0).getClass().getSimpleName();
 
-    @InjectMocks
-    private SelectTextCommand selectTextCommand;
-
-    @BeforeEach
-    void setUp() {
-        //не понимаю зачем тебе вот это
-        //selectTextCommand.setApplicationContext(applicationContext);
+        assertEquals("StartCommand", actualResult);
     }
 
     @Test
-    void testGetCommandByName_ExistingCommand_ReturnsSendMessageCommand() {
-        // Arrange
-        String commandName = "validCommand";
-        when(applicationContext.containsBean(commandName)).thenReturn(true);
-        when(applicationContext.getBean(commandName, sendMessageCommand)).thenReturn(sendMessageCommand);
+    void testStrategyPatternWrong() {
+        List<SendMessageCommand> sendObjects = List.of(
+                new StartCommand(),
+                new HelpCommand()
+                //and others
+        );
 
-        // Act
-        SendMessageCommand result = selectTextCommand.getCommandByName(commandName);
+        SelectTextCommand factoryExample = new SelectTextCommand(sendObjects);
+        List<SendMessageCommand> process = factoryExample.getCommandByName("/new_command");
 
-        // Assert
-        assertEquals(sendMessageCommand, result);
-    }
-
-    @Test
-    void testGetCommandByName_NonExistingCommand_ReturnsIncorrectCommand() {
-        // Arrange
-        String invalidCommandName = "invalidCommand";
-        when(applicationContext.containsBean(invalidCommandName)).thenReturn(false);
-        IncorrectCommand incorrectCommand = new IncorrectCommand();
-        when(applicationContext.getBean(IncorrectCommand.class)).thenReturn(incorrectCommand);
-
-        // Act
-        SendMessageCommand result = selectTextCommand.getCommandByName(invalidCommandName);
-
-        // Assert
-        assertEquals(incorrectCommand, result);
-    }
-
-    @Test
-    void testGetCommandByName_FactoryCreatesAllStrategyInstances() {
-        // Arrange
-        List<SendMessageCommand> sendObjects = Arrays.asList(new StartCommand(), new HelpCommand());
-        when(applicationContext.containsBean("startCommand")).thenReturn(true);
-
-        //todo тесты лучше делать атомарными. чтобы они пятьсот всего не проверяли. не поняла зачем тут второй класс, если достаточно одного
-//        when(applicationContext.containsBean("helpCommand")).thenReturn(true);
-        when(applicationContext.getBean("startCommand", StartCommand.class)).thenReturn((StartCommand)sendObjects.get(0));
-//        when(applicationContext.getBean("helpCommand", sendObjects.get(1))).thenReturn(sendObjects.get(1));
-
-        selectTextCommand.setSendObjects(sendObjects);
-
-        // Act
-        SendMessageCommand resultStrategy1 = selectTextCommand.getCommandByName("startCommand");
-//        SendMessageCommand resultStrategy2 = selectTextCommand.getCommandByName("helpCommand");
-
-        // Assert
-        assertEquals(StartCommand.class, resultStrategy1.getClass());
-//        assertEquals(HelpCommand.class, resultStrategy2.getClass());
+        assertTrue(process.isEmpty());
     }
 }

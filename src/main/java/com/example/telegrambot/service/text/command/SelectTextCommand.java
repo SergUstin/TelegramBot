@@ -1,37 +1,33 @@
 package com.example.telegrambot.service.text.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
-@Component
+@Service // Правильнее же использовать эту аннотацию? У нас же тут бизнес логика!
 public class SelectTextCommand {
-
-    private ApplicationContext applicationContext;
-
-    private List<SendMessageCommand> sendObjects;
+    private final List<SendMessageCommand> commandList; // Такое название подойдет? Выбрал и того что идея предлагала
 
     @Autowired
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public SelectTextCommand(List<SendMessageCommand> commandList) {
+        this.commandList = commandList;
     }
 
+    public List<SendMessageCommand> getCommandByName(String command) {
 
-    @Autowired
-    public void setSendObjects(List<SendMessageCommand> sendObjects) {
-        this.sendObjects = sendObjects;
-    }
-    public SendMessageCommand getCommandByName(String commandName) {
-        return applicationContext.getBean(commandName,
-                sendObjects.stream()
-                        .findAny()
-
-
-                        .orElseGet(() -> applicationContext.getBean(IncorrectCommand.class)) //todo попытался, но теперь начал выбрасывать BeanNotOfRequiredTypeException:
-                        .getClass()); //todo старайся никогда не использовать get().
-        //todo там есть команды orElseGet и orElseThrow
-
+        return commandList.stream()
+                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class))
+                .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(command)) // добавил filter
+                .findFirst()
+                .map(Collections::singletonList)
+                .orElseGet(() ->  // поменял
+                        commandList.stream()
+                                .filter(clazz -> clazz.getClass().getAnnotation(Component.class)
+                                        .value().equals("/incorrect"))
+                                .findFirst().stream().toList()
+                );
     }
 }
