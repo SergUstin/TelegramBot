@@ -23,7 +23,6 @@ public class SelectTextCommand {
     public void setSendObjects(List<SendMessageCommand> sendObjects) {
         this.sendObjects = sendObjects;
     }
-
     public SendMessageCommand getCommandByName(String commandName) {
         return applicationContext.getBean(commandName,
                 sendObjects.stream()
