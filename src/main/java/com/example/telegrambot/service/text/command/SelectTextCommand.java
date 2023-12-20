@@ -1,31 +1,29 @@
 package com.example.telegrambot.service.text.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-@Component
+@Service // Правильнее же использовать эту аннотацию? У нас же тут бизнес логика!
 public class SelectTextCommand {
-    private final List<SendMessageCommand> list;
+    private final List<SendMessageCommand> commandList; // Такое название подойдет? Выбрал и того что идея предлагала
 
     @Autowired
-    public SelectTextCommand(List<SendMessageCommand> list) {
-        this.list = list;
+    public SelectTextCommand(List<SendMessageCommand> commandList) {
+        this.commandList = commandList;
     }
 
     public List<SendMessageCommand> getCommandByName(String command) {
-        return list.stream()
-                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class)
-                        && clazz.getClass().getAnnotation(Component.class).value().equals(command))
+        return commandList.stream()
+                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class))
+                .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(command)) // добавил filter
                 .findFirst()
                 .map(Collections::singletonList)
-                .orElse(
-                        list.stream()
+                .orElseGet(() ->  // поменял
+                        commandList.stream()
                                 .filter(clazz -> clazz.getClass().getAnnotation(Component.class)
                                         .value().equals("/incorrect"))
                                 .findFirst().stream().toList()

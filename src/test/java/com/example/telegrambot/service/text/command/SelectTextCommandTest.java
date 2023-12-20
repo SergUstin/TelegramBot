@@ -25,8 +25,8 @@ public class SelectTextCommandTest {
                 //and others
                 );
 
-        FactoryExample factoryExample = new FactoryExample(sendObjects);
-        List<SendMessageCommand> process = factoryExample.process("/start");
+        SelectTextCommand factoryExample = new SelectTextCommand(sendObjects);
+        List<SendMessageCommand> process = factoryExample.getCommandByName("/start");
         String actualResult = process.get(0).getClass().getSimpleName();
 
         assertEquals("StartCommand", actualResult);
@@ -40,8 +40,8 @@ public class SelectTextCommandTest {
                 //and others
         );
 
-        FactoryExample factoryExample = new FactoryExample(sendObjects);
-        List<SendMessageCommand> process = factoryExample.process("/new_command");
+        SelectTextCommand factoryExample = new SelectTextCommand(sendObjects);
+        List<SendMessageCommand> process = factoryExample.getCommandByName("/new_command");
 
         assertTrue(process.isEmpty());
     }
