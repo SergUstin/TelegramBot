@@ -1,9 +1,9 @@
 package com.example.telegrambot.service;
 
 import com.example.telegrambot.config.BotConfig;
-import com.example.telegrambot.service.file.command.SelectFileCommand;
-import com.example.telegrambot.service.text.command.SelectTextCommand;
-import com.example.telegrambot.service.text.command.SendMessageCommand;
+import com.example.telegrambot.service.command.file.SelectFileCommand;
+import com.example.telegrambot.service.command.text.SelectTextCommand;
+import com.example.telegrambot.service.command.text.SendMessageCommand;
 import com.example.telegrambot.util.RowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

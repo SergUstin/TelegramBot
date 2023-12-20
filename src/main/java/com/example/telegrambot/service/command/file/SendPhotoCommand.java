@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.file.command;
+package com.example.telegrambot.service.command.file;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;

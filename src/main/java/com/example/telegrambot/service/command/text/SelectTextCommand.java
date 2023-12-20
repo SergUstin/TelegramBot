@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.text.command;
+package com.example.telegrambot.service.command.text;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

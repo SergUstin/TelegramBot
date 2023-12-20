@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.file.command;
+package com.example.telegrambot.service.command.file;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
