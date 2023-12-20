@@ -17,6 +17,7 @@ public class SelectTextCommand {
     }
 
     public List<SendMessageCommand> getCommandByName(String command) {
+
         return commandList.stream()
                 .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class))
                 .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(command)) // добавил filter
