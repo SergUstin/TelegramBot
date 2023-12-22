@@ -3,12 +3,13 @@ package com.example.telegrambot.service;
 import com.example.telegrambot.config.BotConfig;
 import com.example.telegrambot.service.command.file.SelectFileCommand;
 import com.example.telegrambot.service.command.text.SelectTextCommand;
-import com.example.telegrambot.service.command.text.SendMessageCommand;
+import com.example.telegrambot.service.command.text.SendTextCommand;
 import com.example.telegrambot.util.RowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
@@ -16,6 +17,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -29,15 +31,15 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     static final String ERROR_TEXT = "Error occurred: ";
 
-    public TelegramBot(BotConfig config, SelectTextCommand selectCommand, SelectFileCommand selectFileCommand) {
+    public TelegramBot(BotConfig config, SelectTextCommand selectTextCommand, SelectFileCommand selectFileCommand) {
         this.config = config;
-        this.selectTextCommand = selectCommand;
+        this.selectTextCommand = selectTextCommand;
         this.selectFileCommand = selectFileCommand;
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
         listOfCommands.add(new BotCommand("/register", "register you data"));
-//        listOfCommands.add(new BotCommand("/photo", "get a photo"));
+        listOfCommands.add(new BotCommand("/photo", "get a photo"));
         listOfCommands.add(new BotCommand("/settings", "set your preferences"));
         listOfCommands.add(new BotCommand("/help", "description bot"));
         try {
@@ -63,9 +65,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             messageText = update.getMessage().getText();
-            List<SendMessageCommand> commandByName = selectTextCommand.getCommandByName(messageText);
 
-            for (SendMessageCommand command : commandByName) {
+            List<SendTextCommand> commandByName = selectTextCommand.getCommandByName(messageText);
+
+            for (SendTextCommand command : commandByName) {
 
                 try {
                     execute(command.setCommand(update));
