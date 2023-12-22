@@ -26,7 +26,6 @@ public class StartCommand extends SendText {
                 update.getMessage().getChat().getFirstName() +
                 ", nice to meet you!" + " :blush:");
 
-
         registerUser(update.getMessage());
         log.info("Replied to user " + update.getMessage().getChat().getFirstName());
 
