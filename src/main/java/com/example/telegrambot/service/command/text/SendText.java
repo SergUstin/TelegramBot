@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public abstract class SendText implements SendMessageCommand {
+public abstract class SendText implements SendTextCommand {
 
     SendMessage sendMessage(long chatId, String texToSend) {
         SendMessage message = SendMessage.builder()

@@ -21,13 +21,14 @@ public class SendAddCommand extends SendText {
 
     @Override
     public SendMessage setCommand(Update update) {
+        SendMessage sendMessage = null;
         if (Objects.equals(config.getOwnerId(), update.getMessage().getChatId())) {
             var textToSend = EmojiParser.parseToUnicode(update.getMessage().getText().substring(update.getMessage().getText().indexOf(" ")));
             var users = userRepository.findAll();
             for (User user : users) {
-                return sendMessage(user.getChatId(), textToSend);
+                sendMessage = sendMessage(user.getChatId(), textToSend);
             }
         }
-        return new IncorrectCommand().setCommand(update);
+        return sendMessage;
     }
 }
