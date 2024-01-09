@@ -14,19 +14,28 @@ import java.util.Objects;
 @Component("/send")
 public class SendAddCommand extends SendText {
 
-    @Autowired // Я не понимаю почему я удалил!! Вернул
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private BotConfig config;
+    private final BotConfig config;
+
+    @Autowired
+    public SendAddCommand(UserRepository userRepository, BotConfig config) {
+        this.userRepository = userRepository;
+        this.config = config;
+    }
 
     @Override
     public SendMessage setCommand(Update update) {
         SendMessage sendMessage = null;
-        if (Objects.equals(config.getOwnerId(), update.getMessage().getChatId())) {
-            var textToSend = EmojiParser.parseToUnicode(update.getMessage().getText().substring(update.getMessage().getText().indexOf(" ")));
-            var users = userRepository.findAll();
-            for (User user : users) {
-                sendMessage = sendMessage(user.getChatId(), textToSend);
+        if (config.getOwnerId().equals(update.getMessage().getChatId())) {
+            var messageText = update.getMessage().getText();
+            var spaceIndex = messageText.indexOf(4, update.getMessage().getText().length());
+            if (spaceIndex != -1) {
+                var textToSend = EmojiParser.parseToUnicode(messageText.substring(spaceIndex + 1));
+                var users = userRepository.findAll();
+                for (User user : users) {
+                    sendMessage = sendMessage(user.getChatId(), textToSend);
+                }
             }
         }
         return sendMessage;
