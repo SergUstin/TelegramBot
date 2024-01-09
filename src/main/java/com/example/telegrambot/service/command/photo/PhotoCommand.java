@@ -1,4 +1,4 @@
-package com.example.telegrambot.service.command.file;
+package com.example.telegrambot.service.command.photo;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
