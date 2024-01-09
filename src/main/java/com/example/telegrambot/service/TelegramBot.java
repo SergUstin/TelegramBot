@@ -2,6 +2,7 @@ package com.example.telegrambot.service;
 
 import com.example.telegrambot.config.BotConfig;
 import com.example.telegrambot.service.command.file.SelectFileCommand;
+import com.example.telegrambot.service.command.file.SendFileCommand;
 import com.example.telegrambot.service.command.text.SelectTextCommand;
 import com.example.telegrambot.service.command.text.SendTextCommand;
 import com.example.telegrambot.util.RowUtil;
@@ -25,7 +26,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
 
-    private final SelectTextCommand selectTextCommand;
+//    private final SelectTextCommand selectTextCommand;
 
     private final SelectFileCommand selectFileCommand;
 
@@ -33,7 +34,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     public TelegramBot(BotConfig config, SelectTextCommand selectTextCommand, SelectFileCommand selectFileCommand) {
         this.config = config;
-        this.selectTextCommand = selectTextCommand;
+//        this.selectTextCommand = selectTextCommand;
         this.selectFileCommand = selectFileCommand;
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
@@ -66,16 +67,26 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             messageText = update.getMessage().getText();
 
-            List<SendTextCommand> commandByName = selectTextCommand.getCommandByName(messageText);
+            // Отправка текста
+//            List<SendTextCommand> commandByName = selectTextCommand.getCommandByName(messageText);
+//
+//            for (SendTextCommand command : commandByName) {
+//
+//                try {
+//                    execute(command.setCommand(update));
+//                } catch (TelegramApiException e) {
+//                    throw new RuntimeException(e);
+//                }
+//
+//            }
 
-            for (SendTextCommand command : commandByName) {
-
+            // Отправка фото
+            for (SendFileCommand command : selectFileCommand.getCommandByName(messageText)) {
                 try {
                     execute(command.setCommand(update));
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
         } else if (update.hasCallbackQuery()) {
