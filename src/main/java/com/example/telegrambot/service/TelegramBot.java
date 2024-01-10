@@ -83,9 +83,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
             } else {
                 // Отправка файла, сообщения, фото и пр.
-                for (PartialBotApiMethod method : selectCommand.getCommandByName(messageText, update)) {
+                List<BotApiMethod> commandByName = selectCommand.getCommandByName(messageText);
+                for (BotApiMethod method : commandByName) {
                     try {
-                        execute((BotApiMethod<? extends Serializable>) method.);
+                        execute(method);
                     } catch (TelegramApiException e) {
                         throw new RuntimeException(e);
                     }

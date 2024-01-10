@@ -25,14 +25,14 @@ public class SelectCommand {
         this.sendPhotoCommands = sendPhotoCommands;
     }
 
-    public List<? extends PartialBotApiMethod> getCommandByName(String command) {
-        List<PartialBotApiMethod> commandList = new ArrayList<>();
+    public List<BotApiMethod> getCommandByName(String command) {
+        List<BotApiMethod> commandList = new ArrayList<>();
         for (SendTextCommand textCommand : sendTextCommands) {
-            commandList.add((PartialBotApiMethod) textCommand);
+            commandList.add((BotApiMethod) textCommand);
         }
 
         for (SendPhotoCommand photoCommand : sendPhotoCommands) {
-            commandList.add((PartialBotApiMethod) photoCommand);
+            commandList.add((BotApiMethod) photoCommand);
         }
 
         return commandList.stream()
