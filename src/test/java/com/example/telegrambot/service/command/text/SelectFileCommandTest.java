@@ -8,18 +8,18 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SelectTextCommandTest {
+public class SelectFileCommandTest {
 
     @Test
     void testStrategyPattern() {
-        List<SendMessageCommand> sendObjects = List.of(
+        List<SendTextCommand> sendObjects = List.of(
                 new StartCommand(),
                 new HelpCommand()
                 //and others
                 );
 
         SelectTextCommand factoryExample = new SelectTextCommand(sendObjects);
-        List<SendMessageCommand> process = factoryExample.getCommandByName("/start");
+        List<SendTextCommand> process = factoryExample.getCommandByName("/start");
         String actualResult = process.get(0).getClass().getSimpleName();
 
         assertEquals("StartCommand", actualResult);
@@ -27,14 +27,14 @@ public class SelectTextCommandTest {
 
     @Test
     void testStrategyPatternWrong() {
-        List<SendMessageCommand> sendObjects = List.of(
+        List<SendTextCommand> sendObjects = List.of(
                 new StartCommand(),
                 new HelpCommand()
                 //and others
         );
 
         SelectTextCommand factoryExample = new SelectTextCommand(sendObjects);
-        List<SendMessageCommand> process = factoryExample.getCommandByName("/new_command");
+        List<SendTextCommand> process = factoryExample.getCommandByName("/new_command");
 
         assertTrue(process.isEmpty());
     }

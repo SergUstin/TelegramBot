@@ -1,11 +1,11 @@
-package com.example.telegrambot.service.command.file;
+package com.example.telegrambot.service.command.photo;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 
 import java.io.InputStream;
 
-public abstract class SendFile implements SendPhotoCommand {
+public abstract class SendFile implements SendFileCommand {
 
     SendPhoto sendPhoto(long chatId, String path) {
         InputStream resource = getClass().getResourceAsStream(path);
