@@ -7,5 +7,4 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 public interface SendTextCommand {
     SendMessage setCommand(Update update);
-    boolean support(String command);
 }
