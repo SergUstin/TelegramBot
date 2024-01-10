@@ -93,7 +93,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 }
             }
-
         } else if (update.hasCallbackQuery()) {
             try {
                 execute(RowUtil.rowSet(update));
