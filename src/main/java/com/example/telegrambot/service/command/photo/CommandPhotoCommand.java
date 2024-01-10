@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component("/photo")
-public class PhotoCommand extends SendFile {
+public class CommandPhotoCommand extends SendCommandPhoto {
 
     private final static String PATH = "src/main/resources/Java.jpg";
 

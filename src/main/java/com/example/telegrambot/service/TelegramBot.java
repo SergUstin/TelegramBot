@@ -3,15 +3,14 @@ package com.example.telegrambot.service;
 import com.example.telegrambot.config.BotConfig;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
-import com.example.telegrambot.service.command.photo.SelectFileCommand;
-import com.example.telegrambot.service.command.photo.SendFileCommand;
-import com.example.telegrambot.service.command.text.SelectTextCommand;
-import com.example.telegrambot.service.command.text.SendTextCommand;
+import com.example.telegrambot.service.command.SelectCommand;
 import com.example.telegrambot.util.RowUtil;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -19,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,14 +30,16 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
 
-    private final SelectTextCommand selectTextCommand;
+    private final SelectCommand selectCommand;
 
     static final String ERROR_TEXT = "Error occurred: ";
 
-    public TelegramBot(UserRepository userRepository, BotConfig config, SelectTextCommand selectTextCommand) {
+    public TelegramBot(UserRepository userRepository,
+                       BotConfig config,
+                       SelectCommand selectCommand) {
         this.userRepository = userRepository;
         this.config = config;
-        this.selectTextCommand = selectTextCommand;
+        this.selectCommand = selectCommand;
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
@@ -80,17 +82,16 @@ public class TelegramBot extends TelegramLongPollingBot {
                     }
                 }
             } else {
-                List<SendTextCommand> commandByName = selectTextCommand.getCommandByName(messageText);
-
-                for (SendTextCommand command : commandByName) {
-
+                // Отправка файла, сообщения, фото и пр.
+                for (PartialBotApiMethod method : selectCommand.getCommandByName(messageText, update)) {
                     try {
-                        execute(command.setCommand(update));
+                        execute((BotApiMethod<? extends Serializable>) method);
                     } catch (TelegramApiException e) {
                         throw new RuntimeException(e);
                     }
-
                 }
+
+
             }
         } else if (update.hasCallbackQuery()) {
             try {

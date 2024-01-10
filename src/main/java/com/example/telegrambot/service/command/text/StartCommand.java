@@ -20,6 +20,11 @@ public class StartCommand extends SendText {
     private UserRepository userRepository;
 
     @Override
+    public boolean support(String command) {
+        return command.equals("/start");
+    }
+
+    @Override
     public SendMessage setCommand(Update update) {
 
         String answer = EmojiParser.parseToUnicode("Hi, " +
