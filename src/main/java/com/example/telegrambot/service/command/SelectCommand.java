@@ -1,40 +1,47 @@
 package com.example.telegrambot.service.command;
 
+import com.example.telegrambot.service.command.text.IncorrectCommand;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+
 import java.util.Collections;
 import java.util.List;
 
 @Service
 public class SelectCommand {
 
-    private final SendCommand<?> sendCommands;
+    private final List<SendCommand<?>> sendCommands;
 
-    public SelectCommand(@Qualifier("/start") SendCommand<?> sendCommands) {
+    @Autowired
+    public SelectCommand(List<SendCommand<?>> sendCommands) {
         this.sendCommands = sendCommands;
     }
 
     public SendCommand<?> getCommandByName(String command) {
 
-//        return sendCommands.stream()
+//        return (SendCommand<?>) sendCommands.stream()
 //                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class))
 //                .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(command))
 //                .findFirst()
-//                .orElse(null);
+//                .map(SendCommand::getType)
+//                .filter(commandInstance -> commandInstance instanceof SendPhoto || commandInstance instanceof SendMessage)
+//                .orElse(new IncorrectCommand());
 
-//        return sendCommands.stream()
-//                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class))
-//                .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(command))
-//                .findFirst()
-//                .map(Collections::singletonList)
-//                .orElseGet(() ->
-//                        sendCommands.stream()
-//                                .filter(clazz -> clazz.getClass().getAnnotation(Component.class)
-//                                        .value().equals("/incorrect"))
-//                                .findFirst().stream().toList()
-//                );
-        return null;
+        return (SendCommand<?>) sendCommands.stream()
+                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class))
+                .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(command))
+                .findFirst()
+                .map(SendCommand::getType)
+                .map(Collections::singletonList)
+                .orElseGet(() ->
+                        Collections.singletonList(Collections.singletonList(sendCommands.stream()
+                                .filter(clazz -> clazz.getClass().getAnnotation(Component.class)
+                                        .value().equals("/incorrect"))
+                                .findFirst().stream().toList()))
+                );
+//        return null;
     }
 }

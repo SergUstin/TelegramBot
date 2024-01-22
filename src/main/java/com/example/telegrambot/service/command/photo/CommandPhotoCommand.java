@@ -13,4 +13,9 @@ public class CommandPhotoCommand extends SendCommandPhoto {
     public SendPhoto setCommand(Update update) {
         return sendPhoto(update.getMessage().getChatId(), PATH);
     }
+
+    @Override
+    public SendPhoto getType() {
+        return SendPhoto.builder().build();
+    }
 }
