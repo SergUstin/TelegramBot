@@ -1,5 +1,6 @@
 package com.example.telegrambot.service.command.text;
 
+import com.example.telegrambot.service.command.SendCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -7,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SendText implements SendTextCommand {
+public abstract class SendText implements SendCommand<SendMessage> {
 
     SendMessage sendMessage(long chatId, String texToSend) {
         SendMessage message = SendMessage.builder()

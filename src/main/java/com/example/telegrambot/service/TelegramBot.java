@@ -4,6 +4,7 @@ import com.example.telegrambot.config.BotConfig;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
 import com.example.telegrambot.service.command.SelectCommand;
+import com.example.telegrambot.service.command.SendCommand;
 import com.example.telegrambot.util.RowUtil;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -83,14 +85,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
             } else {
                 // Отправка файла, сообщения, фото и пр.
-                List<BotApiMethod> commandByName = selectCommand.getCommandByName(messageText);
-                for (BotApiMethod method : commandByName) {
-                    try {
-                        execute(method);
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                execute(selectCommand.getCommandByName(messageText));
+
 
 
             }
