@@ -15,7 +15,7 @@ public class CommandPhotoCommand extends SendCommandPhoto {
     }
 
     @Override
-    public SendPhoto getType() {
-        return SendPhoto.builder().build();
+    public Class getType() {
+        return SendPhoto.class;
     }
 }

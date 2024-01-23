@@ -20,7 +20,7 @@ public class SelectCommand {
         this.sendCommands = sendCommands;
     }
 
-    public SendCommand<?> getCommandByName(String command) {
+    public Class getCommandByName(String command) {
 
 //        return (SendCommand<?>) sendCommands.stream()
 //                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class))
@@ -31,9 +31,11 @@ public class SelectCommand {
 //                .orElse(new IncorrectCommand());
 
         return (SendCommand<?>) sendCommands.stream()
-                .filter(clazz -> clazz.getClass().isAnnotationPresent(Component.class))
                 .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(command))
                 .findFirst()
+                .map(clazz -> {
+                    clazz.
+                })
                 .map(SendCommand::getType)
                 .map(Collections::singletonList)
                 .orElseGet(() ->

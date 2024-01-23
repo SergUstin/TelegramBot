@@ -3,14 +3,13 @@ package com.example.telegrambot.service;
 import com.example.telegrambot.config.BotConfig;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
-import com.example.telegrambot.service.command.SelectCommand;
 import com.example.telegrambot.service.command.SendCommand;
 import com.example.telegrambot.util.RowUtil;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -19,10 +18,9 @@ import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,16 +30,16 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
 
-    private final SelectCommand selectCommand;
+    private final List<SendCommand> sendCommands;
 
     static final String ERROR_TEXT = "Error occurred: ";
 
     public TelegramBot(UserRepository userRepository,
                        BotConfig config,
-                       SelectCommand selectCommand) {
+                       List<SendCommand> sendCommands) {
         this.userRepository = userRepository;
         this.config = config;
-        this.selectCommand = selectCommand;
+        this.sendCommands = sendCommands;
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
@@ -85,7 +83,11 @@ public class TelegramBot extends TelegramLongPollingBot {
                 }
             } else {
                 // Отправка файла, сообщения, фото и пр.
-                execute(selectCommand.getCommandByName(messageText));
+                sendCommands.stream()
+                        .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(messageText))
+                        .findFirst()
+                        .orElseGet(() -> )
+
 
 
 
