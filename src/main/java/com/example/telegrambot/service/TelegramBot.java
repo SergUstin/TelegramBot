@@ -1,6 +1,7 @@
 package com.example.telegrambot.service;
 
 import com.example.telegrambot.config.BotConfig;
+import com.example.telegrambot.model.Ads;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
 import com.example.telegrambot.service.command.SendCommand;
@@ -8,6 +9,7 @@ import com.example.telegrambot.util.RowUtil;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -91,7 +93,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     try {
                         execute(new SendMessage(String.valueOf(user.getChatId()), textToSend));
                     } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
+                        log.error(ERROR_TEXT + e.getMessage());
                     }
                 }
             } else {
