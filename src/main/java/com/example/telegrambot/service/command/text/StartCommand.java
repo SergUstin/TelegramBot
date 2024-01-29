@@ -2,6 +2,7 @@ package com.example.telegrambot.service.command.text;
 
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
+import com.example.telegrambot.service.TelegramBot;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
 
@@ -18,6 +20,10 @@ public class StartCommand extends SendText {
 
     @Autowired
     private UserRepository userRepository;
+
+    public StartCommand(TelegramBot bot) {
+        super(bot);
+    }
 
     @Override
     public SendMessage setCommand(Update update) {

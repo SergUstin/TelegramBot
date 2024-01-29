@@ -1,5 +1,6 @@
 package com.example.telegrambot.service.command.text;
 
+import com.example.telegrambot.service.TelegramBot;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,6 +16,10 @@ public class HelpCommand extends SendText {
             "Type /register you can register you data\n\n" +
             "Type /settings to see setting bot\n\n" +
             "Type /help to see description bot";
+
+    public HelpCommand(TelegramBot bot) {
+        super(bot);
+    }
 
     @Override
     public SendMessage setCommand(Update update) {

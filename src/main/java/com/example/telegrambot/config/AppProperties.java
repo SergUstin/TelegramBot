@@ -1,6 +1,5 @@
 package com.example.telegrambot.config;
 
-//import ar.vicria.utils.ClassUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 

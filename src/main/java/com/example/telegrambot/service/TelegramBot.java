@@ -7,9 +7,11 @@ import com.example.telegrambot.service.command.SendCommand;
 import com.example.telegrambot.util.RowUtil;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -17,7 +19,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +40,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     public TelegramBot(UserRepository userRepository,
                        BotConfig config,
-                       List<SendCommand> sendCommands) {
+                       @Lazy List<SendCommand> sendCommands) {
         this.userRepository = userRepository;
         this.config = config;
         this.sendCommands = sendCommands;
@@ -45,12 +49,21 @@ public class TelegramBot extends TelegramLongPollingBot {
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
         listOfCommands.add(new BotCommand("/register", "register you data"));
         listOfCommands.add(new BotCommand("/photo", "get a photo"));
-        listOfCommands.add(new BotCommand("/settings", "set your preferences"));
         listOfCommands.add(new BotCommand("/help", "description bot"));
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
             log.error("Error setting bot's command list: " + e.getMessage());
+        }
+    }
+
+    @PostConstruct
+    private void init() {
+        try {
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            telegramBotsApi.registerBot(this);
+        } catch (TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
         }
     }
 
@@ -86,11 +99,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                 sendCommands.stream()
                         .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(messageText))
                         .findFirst()
-                        .orElseGet(() -> )
-
-
-
-
+                        .ifPresent(clazz -> {
+                            try {
+                                clazz.execute(update);
+                            } catch (TelegramApiException e) {
+                                log.error(ERROR_TEXT + e.getMessage());
+                            }
+                        });
             }
         } else if (update.hasCallbackQuery()) {
             try {

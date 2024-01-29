@@ -1,9 +1,13 @@
 package com.example.telegrambot.service.command;
 
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public interface SendCommand<T> {
-    PartialBotApiMethod setCommand(Update update);
-    Class getType();
+
+    T setCommand(Update update);
+
+    void execute(T t) throws TelegramApiException;
+
+    void execute(Update update) throws TelegramApiException;
 }

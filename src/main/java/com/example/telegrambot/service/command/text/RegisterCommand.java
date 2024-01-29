@@ -1,5 +1,6 @@
 package com.example.telegrambot.service.command.text;
 
+import com.example.telegrambot.service.TelegramBot;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -14,6 +15,10 @@ public class RegisterCommand extends SendText {
 
     static final String YES_BUTTON = "YES_BUTTON";
     static final String NO_BUTTON = "NO_BUTTON";
+
+    public RegisterCommand(TelegramBot bot) {
+        super(bot);
+    }
 
     @Override
     public SendMessage setCommand(Update update) {
