@@ -29,4 +29,6 @@ logging:
     file: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
   file:
     name: log/logging.log
-    max-size: 10MB
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
