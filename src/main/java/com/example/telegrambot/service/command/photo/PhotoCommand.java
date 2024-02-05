@@ -2,6 +2,7 @@ package com.example.telegrambot.service.command.photo;
 
 import com.example.telegrambot.service.TelegramBot;
 import com.example.telegrambot.service.command.SendCommand;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -16,6 +17,7 @@ public class PhotoCommand implements SendCommand<SendPhoto> {
     private final static String JPG = "Java.jpg";
     private final TelegramBot bot;
 
+    @Autowired
     public PhotoCommand(TelegramBot bot) {
         this.bot = bot;
     }
