@@ -1,24 +1,28 @@
 package com.example.telegrambot.service;
 
 import com.example.telegrambot.config.BotConfig;
+import com.example.telegrambot.model.Ads;
 import com.example.telegrambot.model.User;
 import com.example.telegrambot.model.UserRepository;
-import com.example.telegrambot.service.command.photo.SelectFileCommand;
-import com.example.telegrambot.service.command.photo.SendFileCommand;
-import com.example.telegrambot.service.command.text.SelectTextCommand;
-import com.example.telegrambot.service.command.text.SendTextCommand;
+import com.example.telegrambot.service.command.SendCommand;
 import com.example.telegrambot.util.RowUtil;
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,25 +34,36 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
 
-    private final SelectTextCommand selectTextCommand;
+    private final List<SendCommand> sendCommands;
 
     static final String ERROR_TEXT = "Error occurred: ";
 
-    public TelegramBot(UserRepository userRepository, BotConfig config, SelectTextCommand selectTextCommand) {
+    public TelegramBot(UserRepository userRepository,
+                       BotConfig config,
+                       @Lazy List<SendCommand> sendCommands) {
         this.userRepository = userRepository;
         this.config = config;
-        this.selectTextCommand = selectTextCommand;
+        this.sendCommands = sendCommands;
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/start", "get a welcome message"));
         listOfCommands.add(new BotCommand("/send", "sand message all users(only admin)"));
         listOfCommands.add(new BotCommand("/register", "register you data"));
         listOfCommands.add(new BotCommand("/photo", "get a photo"));
-        listOfCommands.add(new BotCommand("/settings", "set your preferences"));
         listOfCommands.add(new BotCommand("/help", "description bot"));
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
             log.error("Error setting bot's command list: " + e.getMessage());
+        }
+    }
+
+    @PostConstruct
+    private void init() {
+        try {
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            telegramBotsApi.registerBot(this);
+        } catch (TelegramApiException e) {
+            log.error("Error occurred: " + e.getMessage());
         }
     }
 
@@ -76,21 +91,21 @@ public class TelegramBot extends TelegramLongPollingBot {
                     try {
                         execute(new SendMessage(String.valueOf(user.getChatId()), textToSend));
                     } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
+                        log.error(ERROR_TEXT + e.getMessage());
                     }
                 }
             } else {
-                List<SendTextCommand> commandByName = selectTextCommand.getCommandByName(messageText);
-
-                for (SendTextCommand command : commandByName) {
-
-                    try {
-                        execute(command.setCommand(update));
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                }
+                // Отправка файла, сообщения, фото и пр.
+                sendCommands.stream()
+                        .filter(clazz -> clazz.getClass().getAnnotation(Component.class).value().equals(messageText))
+                        .findFirst()
+                        .ifPresent(clazz -> {
+                            try {
+                                clazz.execute(update);
+                            } catch (TelegramApiException e) {
+                                log.error(ERROR_TEXT + e.getMessage());
+                            }
+                        });
             }
         } else if (update.hasCallbackQuery()) {
             try {

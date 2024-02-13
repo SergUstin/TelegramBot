@@ -1,0 +1,34 @@
+bot:
+  name: StonanysBot
+  token: 6764043787:AAEFa_YrXC2oVE2tacBpePNjvtJJ12Wg_84
+  ownerId: 546565573
+
+cron:
+  scheduler: 0 * * * * *
+
+# db relating settings
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/tg-bot
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+
+# logging customers
+#logging.level.com.example=DEBUG
+logging:
+  level:
+    root: info
+    com.example.telegrambot: debug
+  pattern:
+    #    console: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
+    file: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
+  file:
+    name: log/logging.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
